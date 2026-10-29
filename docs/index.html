@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Juego para adivinar el precio en pesos de productos que se venden en Argentina. Partida rápida, desafío del día y versus de dos jugadores en un solo celular.">
+<meta name="theme-color" content="#FFD60A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Pegale al Precio</title>
+<style>
+html{color-scheme:light;height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;min-height:100%}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una columna pensada para el celular. Cada elemento clave imita la
+   góndola de un súper: etiqueta amarilla con agujero, precio en tipografía de
+   cartel, ficha técnica con renglones punteados. */
+:root{
+  --bg:#E8EBE6; --surface:#FFFFFF; --soft:#F0F2EE; --ink:#14171A; --muted:#5A6068; --line:#C9CFC7;
+  --tag:#FFD60A; --tag-ink:#14171A; --edge:#14171A;
+  --good:#138A4B; --bad:#D92D20; --p2:#2B55E0;
+  --display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --body:'Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1114; --surface:#181B1F; --soft:#1F2328; --ink:#F0F2EE; --muted:#9AA1A8; --line:#2B3036;
+    --edge:#FFD60A; --good:#43C47D; --bad:#FF6B5E; --p2:#7F9CFF; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1114; --surface:#181B1F; --soft:#1F2328; --ink:#F0F2EE; --muted:#9AA1A8; --line:#2B3036;
+  --edge:#FFD60A; --good:#43C47D; --bad:#FF6B5E; --p2:#7F9CFF; color-scheme:dark;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg); color:var(--ink); font:16px/1.4 var(--body);
+  padding-block:16px 32px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--p2);outline-offset:2px}
+h1,h2,p,ul,ol{margin:0}
+.mono{font-family:var(--mono)}
+
+/* Botones */
+.btn{
+  display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;padding:12px 18px;
+  border-radius:10px;border:2px solid var(--edge);background:var(--tag);color:var(--tag-ink);
+  font:800 22px/1 var(--display);letter-spacing:.05em;text-transform:uppercase;
+}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.small{min-height:44px;font-size:18px}
+a.btn{text-decoration:none}
+.rn a{color:var(--p2)}
+.linkbtn{background:transparent;border:0;padding:8px 0;min-height:40px;font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* Etiqueta de precio */
+.tagbox{
+  position:relative;display:flex;align-items:baseline;gap:10px;min-width:0;
+  background:var(--tag);color:var(--tag-ink);border-radius:10px;padding:8px 16px 8px 46px;
+}
+.tagbox::before{
+  content:"";position:absolute;left:15px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
+  background:var(--bg);box-shadow:inset 0 1px 2px rgba(0,0,0,.3);
+}
+.tagbox:focus-within{outline:3px solid var(--p2);outline-offset:2px}
+.cur{font:500 13px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.amt{
+  font:900 64px/1 var(--display);font-variant-numeric:tabular-nums;color:inherit;background:transparent;
+  border:0;padding:0;margin:0;min-width:0;width:100%;outline:none;border-radius:0;
+}
+
+/* Inicio */
+.hero{position:relative;background:var(--tag);color:var(--tag-ink);border-radius:12px;padding:22px 20px 20px 48px}
+.hero::before{
+  content:"";position:absolute;left:16px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;
+  background:var(--bg);box-shadow:inset 0 1px 3px rgba(0,0,0,.3);
+}
+.kicker{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.hero h1{font:900 clamp(56px,18vw,92px)/.86 var(--display);text-transform:uppercase;margin:8px 0 12px;letter-spacing:-.005em}
+.hero p{font-size:15px;max-width:34ch;font-weight:500}
+.modes{display:flex;flex-direction:column;gap:10px}
+.mode{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;width:100%;text-align:left;
+  padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;
+}
+.mode:active{transform:translateY(1px)}
+.mode-name{font:800 28px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.mode-meta{grid-column:1;font:400 12px var(--mono);color:var(--muted)}
+.mode-go{grid-row:1 / span 2;grid-column:2;font:800 30px/1 var(--display)}
+.rules{font-size:14px;color:var(--muted);display:grid;gap:6px}
+.rules b{color:var(--ink);font-weight:600}
+.best{font:400 12px var(--mono);color:var(--muted);letter-spacing:.04em}
+.foot{font-size:12px;color:var(--muted)}
+
+/* Versus: nombres */
+.field{display:grid;gap:6px}
+.field label{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.field input{
+  font:800 26px/1 var(--display);text-transform:uppercase;letter-spacing:.03em;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;width:100%;min-width:0;
+}
+.sec-title{font:900 44px/.95 var(--display);text-transform:uppercase;text-wrap:balance}
+.lead{color:var(--muted);font-size:15px;max-width:40ch}
+
+/* Partida */
+.hud{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.hr{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;text-align:center}
+.hs{font:900 34px/1 var(--display);font-variant-numeric:tabular-nums;text-align:right}
+.hs.multi{font:500 12px/1.35 var(--mono);letter-spacing:.02em}
+.hud2{display:flex;gap:10px;align-items:center;min-height:22px}
+.pips{display:flex;gap:4px;flex:1}
+.pip{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.pip.now,.pip.done{background:var(--ink)}
+.pip.good{background:var(--good)} .pip.mid{background:var(--tag)} .pip.bad{background:var(--bad)}
+.chip{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;background:var(--tag);color:var(--tag-ink);border-radius:4px;padding:3px 7px;white-space:nowrap}
+
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.photo{
+  position:relative;height:128px;display:grid;place-items:center;background-color:var(--soft);
+  background-image:radial-gradient(var(--line) 1px,transparent 1.3px);background-size:14px 14px;
+}
+.cat{position:absolute;left:12px;top:10px;font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.glyph{font-size:76px;line-height:1}
+.info{padding:12px 16px 14px}
+.info h2{font:800 32px/1 var(--display);text-transform:uppercase;letter-spacing:.01em;text-wrap:balance;margin-bottom:10px}
+.ficha{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.specs{list-style:none;padding:0}
+.specs li{font-size:14px;padding:7px 0;border-top:1px dashed var(--line)}
+
+.panel{display:flex;flex-direction:column;gap:12px}
+.who{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.who::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--ink)}
+.who.p1::before{background:var(--p2)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:36px;margin:0;background:transparent;--fill:50%}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:linear-gradient(to right,var(--ink) var(--fill),var(--line) var(--fill))}
+input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:8px;border-radius:4px;background:var(--ink)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-11px;border-radius:50%;background:var(--tag);border:3px solid var(--ink)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--tag);border:3px solid var(--ink)}
+.scale{display:flex;justify-content:space-between;font:400 11px var(--mono);color:var(--muted);margin-top:-6px}
+.nudge{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.nudge button{min-height:44px;border-radius:8px;background:var(--surface);border:1px solid var(--line);font:500 14px var(--mono)}
+.nudge button:active{transform:translateY(1px)}
+
+/* Resultado */
+.result{display:flex;flex-direction:column;gap:14px}
+.verdict{font:900 46px/.95 var(--display);text-transform:uppercase;text-wrap:balance}
+.realline{display:flex;align-items:baseline;gap:10px;font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.realline strong{font:900 34px/1 var(--display);letter-spacing:0;color:var(--ink)}
+.track{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 38px 8px}
+.rail{position:relative}
+.rl{position:absolute;top:24px;bottom:0;width:3px;margin-left:-1.5px;background:var(--ink);z-index:1}
+.rt{position:absolute;top:0;transform:translateX(-50%);background:var(--tag);color:var(--tag-ink);font:500 12px var(--mono);padding:3px 7px;border-radius:4px;white-space:nowrap;z-index:2}
+.gap{position:absolute;height:0;border-top:2px dashed var(--muted);z-index:0}
+.pin{position:absolute;transform:translateX(-50%);height:28px;padding:0 9px;border-radius:14px;font:500 11px/28px var(--mono);white-space:nowrap;z-index:3;background:var(--ink);color:var(--bg)}
+.pin.pin1{background:var(--p2);color:#fff}
+.ticks{position:relative;height:20px;margin-top:2px}
+.ticks span{position:absolute;transform:translateX(-50%);font:400 11px var(--mono);color:var(--muted)}
+.rows{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0;display:grid;gap:3px}
+.r-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.r-name{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);overflow-wrap:anywhere}
+.row.p1 .r-name{color:var(--p2)}
+.r-pts{font:900 32px/1 var(--display);font-variant-numeric:tabular-nums}
+.r-mid{display:flex;flex-wrap:wrap;gap:0 10px;align-items:baseline}
+.r-mid b{font:800 22px/1.1 var(--display);letter-spacing:.01em}
+.r-mid span{font-size:13px;color:var(--muted)}
+.r-sub{font:400 11px var(--mono);color:var(--muted)}
+
+@media (prefers-reduced-motion:no-preference){
+  .rt,.rl{animation:drop .35s ease-out .15s both}
+  .pin{animation:fade .3s ease-out both}
+  @keyframes drop{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  .rl{animation-name:fade}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+}
+
+/* Pase de celular */
+.pass{display:flex;flex-direction:column;gap:16px;padding-top:24px}
+.pass .big{font:900 clamp(64px,22vw,110px)/.88 var(--display);text-transform:uppercase;overflow-wrap:anywhere}
+.pass .small{font:500 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* Fin */
+.end{display:flex;flex-direction:column;gap:16px}
+.end .title{font:900 clamp(44px,14vw,68px)/.9 var(--display);text-transform:uppercase;text-wrap:balance}
+.end .tagbox .amt{font-size:72px;width:auto}
+.note{font:500 12px var(--mono);letter-spacing:.06em;color:var(--muted);min-height:16px}
+.recap{list-style:none;padding:0;display:grid;gap:8px}
+.recap li{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.rg{font-size:30px;line-height:1}
+.rn{min-width:0;display:grid}
+.rn b{font:800 18px/1.1 var(--display);text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+.rn small{font:400 11px var(--mono);color:var(--muted)}
+.rp{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:2px 14px;font:400 12px var(--mono)}
+.rp em{font-style:normal;font-weight:500;color:var(--good)}
+.rp .p1{color:var(--p2)}
+.rp .p1 em{color:var(--p2)}
+.actions{display:grid;gap:10px}
+.sharebox{width:100%;min-height:84px;font:400 13px/1.4 var(--mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;resize:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- INICIO -->
+  <section id="s-home" class="wrap" style="gap:16px">
+    <div class="hero">
+      <div class="kicker">Juego de precios</div>
+      <h1>Pegale<br>al precio</h1>
+      <p>Mirá el producto, leé la ficha técnica y tirá cuánto sale. Cuanto más cerca, más puntos.</p>
+    </div>
+    <div class="modes">
+      <button class="mode" id="m-solo" type="button">
+        <span class="mode-name">Partida rápida</span>
+        <span class="mode-meta">8 rondas · productos al azar</span>
+        <span class="mode-go" aria-hidden="true">→</span>
+      </button>
+      <button class="mode" id="m-daily" type="button">
+        <span class="mode-name">Desafío del día</span>
+        <span class="mode-meta" id="daily-meta">5 rondas · los mismos productos para todos hoy</span>
+        <span class="mode-go" aria-hidden="true">→</span>
+      </button>
+      <button class="mode" id="m-versus" type="button">
+        <span class="mode-name">Versus</span>
+        <span class="mode-meta">2 jugadores · un solo celu</span>
+        <span class="mode-go" aria-hidden="true">→</span>
+      </button>
+    </div>
+    <div class="rules">
+      <p><b>Cómo se puntúa.</b> Hasta 1.000 por ronda según qué tan cerca estés, medido en porcentaje. Si le errás por menos de 3%, sumás 200 más.</p>
+      <p><b>Racha.</b> Cada ronda con más de 700 puntos base suma racha, y la racha multiplica los puntos de la ronda siguiente (hasta ×1,5).</p>
+    </div>
+    <p class="best" id="home-best"></p>
+    <p class="foot">Los precios son de referencia, estimados para octubre 2026 con el dólar a unos $1.560. No son los de una publicación puntual. El botón de cada producto abre la búsqueda en Mercado Libre para ver el precio de hoy. Prototipo: todavía sin fotos reales. Juego de fans, sin relación con Mercado Libre.</p>
+  </section>
+
+  <!-- VERSUS: nombres -->
+  <section id="s-versus" class="wrap" hidden>
+    <button class="linkbtn" type="button" data-home style="align-self:flex-start">← Inicio</button>
+    <h2 class="sec-title">Versus de a dos</h2>
+    <p class="lead">Un solo celu. Cada uno tira su precio en secreto y se muestran juntos al final de cada ronda. Son 5 productos.</p>
+    <div class="field"><label for="n1">Jugador 1</label><input id="n1" type="text" maxlength="10" value="Jugador 1" autocomplete="off"></div>
+    <div class="field"><label for="n2">Jugador 2</label><input id="n2" type="text" maxlength="10" value="Jugador 2" autocomplete="off"></div>
+    <button class="btn" id="v-start" type="button">Empezar</button>
+  </section>
+
+  <!-- PARTIDA -->
+  <section id="s-game" class="wrap" hidden>
+    <div class="hud">
+      <button class="linkbtn" id="quit" type="button">Salir</button>
+      <div class="hr" id="h-round">Ronda 1 / 8</div>
+      <div class="hs" id="h-score">0</div>
+    </div>
+    <div class="hud2"><div class="pips" id="pips"></div><span class="chip" id="h-streak" hidden></span></div>
+
+    <article class="item">
+      <div class="photo"><span class="cat" id="i-cat"></span><span class="glyph" id="i-glyph" aria-hidden="true"></span></div>
+      <div class="info">
+        <h2 id="i-name"></h2>
+        <div class="ficha">Ficha técnica</div>
+        <ul class="specs" id="i-specs"></ul>
+      </div>
+    </article>
+
+    <div class="panel" id="panel-guess">
+      <div class="who" id="who" hidden></div>
+      <div class="tagbox"><span class="cur">$</span><input id="amt" class="amt" type="text" inputmode="numeric" autocomplete="off" value="200.000" aria-label="Precio en pesos argentinos"></div>
+      <div>
+        <input id="slider" type="range" min="0" max="1000" step="1" value="500" aria-label="Precio, escala logarítmica">
+        <div class="scale"><span>$ 10.000</span><span>escala logarítmica</span><span>$ 3.000.000</span></div>
+      </div>
+      <div class="nudge">
+        <button type="button" data-f="0.5">÷2</button>
+        <button type="button" data-f="0.9">−10%</button>
+        <button type="button" data-f="1.1">+10%</button>
+        <button type="button" data-f="2">×2</button>
+      </div>
+      <button class="btn" id="lock" type="button">Fijar precio</button>
+    </div>
+
+    <div class="result" id="panel-result" hidden>
+      <div class="verdict" id="r-verdict"></div>
+      <div class="realline">Precio de referencia <strong id="r-real"></strong></div>
+      <div class="track" id="r-track"></div>
+      <div class="rows" id="r-rows"></div>
+      <a class="btn ghost small" id="r-ml" href="https://listado.mercadolibre.com.ar/" target="_blank" rel="noopener noreferrer">Ver en Mercado Libre</a>
+      <button class="btn" id="r-next" type="button">Siguiente producto</button>
+    </div>
+  </section>
+
+  <!-- PASE DE CELULAR -->
+  <section id="s-pass" class="wrap" hidden>
+    <div class="pass">
+      <div class="small">Ya tiró <span id="pass-from"></span>. No mires.</div>
+      <div class="big">Pasale el celu a <span id="pass-name"></span></div>
+      <button class="btn" id="pass-go" type="button">Listo, soy yo</button>
+    </div>
+  </section>
+
+  <!-- FIN -->
+  <section id="s-end" class="end" hidden>
+    <div class="kicker mono" id="e-mode"></div>
+    <div class="title" id="e-title"></div>
+    <div class="tagbox" id="e-tag"><span class="cur">Pts</span><span class="amt" id="e-score">0</span></div>
+    <div class="rows" id="e-scores" hidden></div>
+    <div class="note" id="e-note"></div>
+    <ul class="recap" id="e-recap"></ul>
+    <div class="actions">
+      <button class="btn" id="e-again" type="button">Jugar de nuevo</button>
+      <button class="btn ghost small" id="e-copy" type="button">Copiar resultado</button>
+      <textarea class="sharebox" id="share-box" readonly hidden aria-label="Resultado para copiar"></textarea>
+      <button class="btn ghost small" type="button" data-home>Inicio</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+'use strict';
+
+/* ---------- Datos: precios de referencia estimados en pesos (octubre 2026, dólar ~ $1.560) ----------
+   n nombre, e ícono, c categoría, s ficha técnica, p precio de referencia en ARS,
+   q texto de búsqueda en Mercado Libre. No son precios de una publicación puntual. */
+const PRODUCTS = [
+  {n:'iPhone 17 256 GB', e:'📱', c:'Celulares', s:['256 GB de almacenamiento','Pantalla OLED de 6,3" a 120 Hz','Cámara frontal de 18 MP'], p:1900000, q:'iphone-17-256gb'},
+  {n:'Samsung Galaxy S25', e:'📱', c:'Celulares', s:['Pantalla AMOLED de 6,2"','Cámara principal de 50 MP','256 GB de almacenamiento'], p:1400000, q:'samsung-galaxy-s25-256gb'},
+  {n:'Motorola Moto G', e:'📱', c:'Celulares', s:['Pantalla de 6,7" a 120 Hz','128 GB y 4 GB de RAM','Batería de 5.000 mAh'], p:280000, q:'motorola-moto-g-128gb'},
+  {n:'Xiaomi Redmi Note', e:'📱', c:'Celulares', s:['Pantalla AMOLED de 6,67"','Cámara principal de 108 MP','Carga rápida de 33 W'], p:420000, q:'xiaomi-redmi-note-256gb'},
+  {n:'PlayStation 5 Slim con lectora', e:'🎮', c:'Consolas', s:['SSD de 1 TB','Salida 4K hasta 120 Hz','Incluye un joystick DualSense'], p:1150000, q:'playstation-5-slim-lectora'},
+  {n:'Nintendo Switch 2', e:'🕹️', c:'Consolas', s:['Pantalla LCD de 7,9" a 120 Hz','256 GB de almacenamiento','Joy-Con magnéticos'], p:950000, q:'nintendo-switch-2'},
+  {n:'AirPods Pro 2', e:'🎧', c:'Audio', s:['Cancelación activa de ruido','Estuche con carga USB-C','Hasta 6 h de batería por carga'], p:380000, q:'airpods-pro-2'},
+  {n:'Sony WH-1000XM5', e:'🎧', c:'Audio', s:['Auriculares over-ear con cancelación de ruido','Hasta 30 h de batería','Bluetooth 5.2'], p:520000, q:'sony-wh-1000xm5'},
+  {n:'Parlante JBL Flip 6', e:'🔊', c:'Audio', s:['Bluetooth, resistente al agua IP67','Hasta 12 h de batería','Sonido estéreo de 2 vías'], p:190000, q:'jbl-flip-6'},
+  {n:'MacBook Air 13" M4', e:'💻', c:'Computación', s:['Chip M4','16 GB de RAM y 256 GB de SSD','Pantalla Liquid Retina de 13,6"'], p:2000000, q:'macbook-air-13-m4'},
+  {n:'Notebook Core i5', e:'💻', c:'Computación', s:['Intel Core i5 de 13.ª generación','16 GB de RAM y 512 GB de SSD','Pantalla Full HD de 15,6"'], p:950000, q:'notebook-core-i5-16gb-512gb'},
+  {n:'iPad 11" (A16)', e:'📲', c:'Tablets', s:['Pantalla Liquid Retina de 11"','128 GB de almacenamiento','Chip A16'], p:650000, q:'ipad-11-a16-128gb'},
+  {n:'Kindle Paperwhite', e:'📖', c:'Lectura', s:['Pantalla de 7" sin reflejos','16 GB de almacenamiento','Resistente al agua IPX8'], p:300000, q:'kindle-paperwhite-16gb'},
+  {n:'Apple Watch Series 11', e:'⌚', c:'Relojes', s:['Caja de aluminio de 42 mm','GPS','Pantalla siempre activa'], p:750000, q:'apple-watch-series-11-42mm'},
+  {n:'Casio F-91W', e:'🕰️', c:'Relojes', s:['Reloj digital con correa de resina','Cronómetro y alarma diaria','Resistente a salpicaduras'], p:35000, q:'casio-f-91w'},
+  {n:'GoPro HERO13 Black', e:'📷', c:'Cámaras', s:['Video 5,3K a 60 fps','Sumergible hasta 10 m','Pantalla frontal y trasera'], p:650000, q:'gopro-hero13-black'},
+  {n:'Dron DJI Mini 4 Pro', e:'🚁', c:'Cámaras', s:['Menos de 249 g','Video 4K HDR a 60 fps','Hasta 34 min de vuelo'], p:1350000, q:'dji-mini-4-pro'},
+  {n:'Monitor gamer 27"', e:'🖥️', c:'Computación', s:['Panel IPS de 1440p','165 Hz y 1 ms','Compatible con FreeSync'], p:430000, q:'monitor-gamer-27-165hz-1440p'},
+  {n:'Teclado mecánico 75%', e:'⌨️', c:'Computación', s:['Switches lineales intercambiables','Conexión Bluetooth y cable','Retroiluminación RGB'], p:140000, q:'teclado-mecanico-75-bluetooth'},
+  {n:'Logitech MX Master 3S', e:'🖱️', c:'Computación', s:['Sensor de 8.000 DPI','Rueda magnética silenciosa','Hasta 70 días de batería'], p:170000, q:'logitech-mx-master-3s'},
+  {n:'SSD portátil de 1 TB', e:'💾', c:'Computación', s:['USB-C, hasta 1.050 MB/s','Carcasa de aluminio','Resistente a golpes'], p:150000, q:'ssd-externo-portatil-1tb'},
+  {n:'GeForce RTX 5070', e:'🎛️', c:'Componentes', s:['12 GB de memoria GDDR7','Arquitectura Blackwell','Compatible con DLSS 4'], p:1100000, q:'geforce-rtx-5070-12gb'},
+  {n:'Smart TV QLED 55"', e:'📺', c:'Televisores', s:['55 pulgadas, resolución 4K','Panel QLED de 60 Hz','Google TV integrado'], p:750000, q:'smart-tv-qled-55-4k'},
+  {n:'Batería externa 20.000 mAh', e:'🔋', c:'Accesorios', s:['Carga rápida de 22,5 W','2 puertos USB-C y 1 USB-A','Indicador digital de carga'], p:60000, q:'power-bank-20000-mah-22w'},
+  {n:'Silla gamer reclinable', e:'🪑', c:'Hogar', s:['Respaldo reclinable hasta 180°','Apoyabrazos 3D regulables','Soporta hasta 120 kg'], p:300000, q:'silla-gamer-reclinable'},
+  {n:'Dyson V15 Detect', e:'🧹', c:'Hogar', s:['Aspiradora inalámbrica, hasta 60 min','Láser que revela el polvo','Pantalla con conteo de partículas'], p:1300000, q:'dyson-v15-detect'},
+  {n:'Aspiradora robot con mapeo', e:'🤖', c:'Hogar', s:['Mapeo láser','Succión de 2.500 Pa','Hasta 150 min de autonomía'], p:450000, q:'aspiradora-robot-mapeo-laser'},
+  {n:'Heladera no frost 350 L', e:'🧊', c:'Electrodomésticos', s:['Capacidad de 350 litros','Freezer superior no frost','Eficiencia energética A'], p:900000, q:'heladera-no-frost-350-litros'},
+  {n:'Lavarropas carga frontal 8 kg', e:'🧺', c:'Electrodomésticos', s:['Capacidad de 8 kg','1.000 rpm de centrifugado','Eficiencia energética A'], p:750000, q:'lavarropas-carga-frontal-8kg'},
+  {n:'Aire acondicionado split inverter', e:'❄️', c:'Electrodomésticos', s:['Frío y calor, 3.000 frigorías','Tecnología inverter','Eficiencia energética A'], p:850000, q:'aire-acondicionado-split-inverter-3000-frigorias'},
+  {n:'Olla eléctrica multifunción 6 L', e:'🍲', c:'Cocina', s:['Capacidad de 6 litros','Cocción a presión y slow cooker','Acero inoxidable'], p:110000, q:'olla-electrica-multifuncion-6-litros'},
+  {n:'Freidora de aire 5,5 L', e:'🍟', c:'Cocina', s:['Canasta de 5,5 L','Hasta 200 °C','Temporizador de 60 min'], p:95000, q:'freidora-de-aire-5-5-litros'},
+  {n:'Cafetera espresso', e:'☕', c:'Cocina', s:['Bomba de 15 bares','Vaporizador de leche','Tanque de 1,5 L'], p:280000, q:'cafetera-espresso-15-bares'},
+  {n:'Pava eléctrica 1,7 L', e:'🫖', c:'Cocina', s:['Acero inoxidable','Corte automático','1.800 W de potencia'], p:40000, q:'pava-electrica-1-7-litros'},
+  {n:'Termo Stanley Classic 1,2 L', e:'🧉', c:'Mate', s:['Acero inoxidable de pared doble','Tapa que sirve de vaso','Capacidad de 1,2 litros'], p:140000, q:'termo-stanley-classic-1-2-litros'},
+  {n:'Stanley Quencher 40 oz', e:'🥤', c:'Accesorios', s:['Vaso térmico de acero inoxidable','1,18 L con manija','Mantiene el frío hasta 11 horas'], p:100000, q:'vaso-stanley-quencher-40-oz'},
+  {n:'Bicicleta MTB rodado 29', e:'🚲', c:'Deportes', s:['Cuadro de aluminio','21 velocidades','Frenos a disco mecánicos'], p:450000, q:'bicicleta-mtb-rodado-29-21-velocidades'},
+  {n:'Pelota de fútbol N°5', e:'⚽', c:'Deportes', s:['Tamaño 5 reglamentario','Cuero sintético cosido a máquina','Cámara de butilo'], p:40000, q:'pelota-futbol-numero-5'},
+  {n:'Carpa para 4 personas', e:'⛺', c:'Camping', s:['Doble techo impermeable','Armado con 2 varillas','Pesa 4,5 kg'], p:200000, q:'carpa-4-personas-doble-techo'},
+  {n:'Mochila de trekking 50 L', e:'🎒', c:'Camping', s:['Espalda ventilada','Funda de lluvia incluida','Arnés regulable'], p:180000, q:'mochila-trekking-50-litros'},
+  {n:'Nike Pegasus 41', e:'👟', c:'Indumentaria', s:['Zapatillas de running','Espuma ReactX','Pesan unos 285 g'], p:230000, q:'nike-pegasus-41'},
+  {n:'Nike Air Force 1 \'07', e:'👟', c:'Indumentaria', s:['Cuero blanco','Cámara de aire en la suela','Modelo clásico de 1982'], p:190000, q:'nike-air-force-1-07'},
+  {n:'Jean Levi\'s 501', e:'👖', c:'Indumentaria', s:['100% algodón denim','Corte recto','Cierre con botones'], p:130000, q:'jean-levis-501'},
+  {n:'Guitarra Squier Stratocaster', e:'🎸', c:'Música', s:['3 micrófonos single-coil','Mástil de arce','Cuerpo de álamo'], p:420000, q:'guitarra-squier-stratocaster'},
+  {n:'Ukelele soprano', e:'🪕', c:'Música', s:['Cuerpo de caoba','4 cuerdas de nylon','Incluye funda'], p:70000, q:'ukelele-soprano'}
+];
+
+const MODES = { solo:{label:'Partida rápida', n:8}, daily:{label:'Desafío del día', n:5}, versus:{label:'Versus', n:5} };
+const MIN = 10000, MAX = 3000000, START_PRICE = 200000, LN_MIN = Math.log(MIN), LN_SPAN = Math.log(MAX) - Math.log(MIN);
+const fmt = new Intl.NumberFormat('es-AR');
+const money = v => '$ ' + fmt.format(Math.round(v));
+const mlUrl = it => 'https://listado.mercadolibre.com.ar/' + it.q;
+
+/* ---------- Lógica pura ---------- */
+function toPos(price){ return (Math.log(price) - LN_MIN) / LN_SPAN; }
+function fromPos(t){
+  const v = Math.exp(LN_MIN + t * LN_SPAN);
+  const step = v < 50000 ? 500 : v < 500000 ? 5000 : v < 1000000 ? 10000 : 50000;
+  return Math.min(MAX, Math.max(MIN, Math.round(v / step) * step));
+}
+function clampPrice(v){ return Math.min(MAX, Math.max(MIN, v)); }
+
+function roundScore(guess, real){
+  const e = Math.abs(Math.log(guess / real));
+  const base = Math.round(1000 * Math.exp(-2.2 * e));
+  const rel = guess / real - 1;
+  const bonus = Math.abs(rel) <= 0.03 ? 200 : 0;
+  return { base, bonus, rel };
+}
+function verdictOf(r){
+  if (r.bonus) return '¡Clavado!';
+  if (r.base >= 800) return 'Muy cerca';
+  if (r.base >= 600) return 'Cerca';
+  if (r.base >= 350) return 'Medio lejos';
+  if (r.base >= 150) return 'Lejos';
+  return 'Ni cerca';
+}
+function rankOf(avg){
+  return avg >= 850 ? 'Gerente de góndola' : avg >= 700 ? 'Cajero veterano' : avg >= 500 ? 'Cliente de todos los días' : avg >= 300 ? 'Primera vez en el súper' : 'Regalador de plata';
+}
+function hashStr(s){
+  let h = 1779033703 ^ s.length;
+  for (let i = 0; i < s.length; i++){ h = Math.imul(h ^ s.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
+  h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909);
+  return (h ^= h >>> 16) >>> 0;
+}
+function mulberry32(a){
+  return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function pick(n, rng){
+  const a = PRODUCTS.map((_, i) => i);
+  for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rng() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a.slice(0, n);
+}
+function todayKey(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function multOf(streak){ return 1 + 0.1 * Math.min(streak, 5); }
+function multText(m){ return '×' + m.toFixed(1).replace('.', ','); }
+function sq(b){ return b >= 700 ? '🟩' : b >= 350 ? '🟨' : '🟥'; }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} }
+};
+
+/* ---------- Estado ---------- */
+const $ = id => document.getElementById(id);
+const SCREENS = ['home', 'versus', 'game', 'pass', 'end'];
+let G = null;
+let price = 100;
+let quitTimer = null;
+
+function show(name){
+  SCREENS.forEach(n => { $('s-' + n).hidden = n !== name; });
+  try { window.scrollTo(0, 0); } catch (e) {}
+}
+function mkPlayer(name){ return { name, total:0, base:0, streak:0 }; }
+
+function renderHome(){
+  const best = +store.get('pap.best') || 0;
+  $('home-best').textContent = best ? 'Tu mejor partida: ' + fmt.format(best) + ' pts' : 'Todavía no hay récord. Jugá una partida.';
+  const d = +store.get('pap.daily.' + todayKey()) || 0;
+  $('daily-meta').textContent = d ? 'Hoy hiciste ' + fmt.format(d) + ' pts · podés mejorarlo' : '5 rondas · los mismos productos para todos hoy';
+}
+
+function startGame(mode, names){
+  const cfg = MODES[mode];
+  const rng = mode === 'daily' ? mulberry32(hashStr('pap-' + todayKey())) : Math.random;
+  const players = mode === 'versus' ? names.map(mkPlayer) : [mkPlayer('Vos')];
+  G = { mode, n:cfg.n, items:pick(cfg.n, rng), round:0, turn:0, players, guesses:[], log:[], pips:[] };
+  renderRound();
+  show('game');
+}
+
+function setPrice(v, fromTyping){
+  price = clampPrice(Math.round(v));
+  $('slider').value = Math.round(toPos(price) * 1000);
+  paintFill();
+  if (!fromTyping) $('amt').value = fmt.format(price);
+}
+function paintFill(){ $('slider').style.setProperty('--fill', ($('slider').value / 10) + '%'); }
+
+function renderPips(){
+  let h = '';
+  for (let i = 0; i < G.n; i++) h += '<span class="pip ' + (G.pips[i] || (i === G.round ? 'now' : '')) + '"></span>';
+  $('pips').innerHTML = h;
+}
+function renderScores(){
+  const hs = $('h-score');
+  if (G.mode === 'versus'){
+    hs.className = 'hs multi';
+    hs.innerHTML = G.players.map(p => esc(p.name) + ' ' + fmt.format(p.total)).join('<br>');
+    $('h-streak').hidden = true;
+  } else {
+    hs.className = 'hs';
+    const p = G.players[0];
+    hs.textContent = fmt.format(p.total);
+    const ch = $('h-streak');
+    if (p.streak > 0){ ch.hidden = false; ch.textContent = 'Racha ' + p.streak + ' · ' + multText(multOf(p.streak)); }
+    else ch.hidden = true;
+  }
+}
+
+function renderRound(){
+  const it = PRODUCTS[G.items[G.round]];
+  $('h-round').textContent = 'Ronda ' + (G.round + 1) + ' / ' + G.n;
+  renderPips(); renderScores();
+  $('i-cat').textContent = it.c;
+  $('i-glyph').textContent = it.e;
+  $('i-name').textContent = it.n;
+  $('i-specs').innerHTML = it.s.map(s => '<li>' + esc(s) + '</li>').join('');
+  const who = $('who');
+  if (G.mode === 'versus'){
+    who.hidden = false;
+    who.textContent = 'Turno de ' + G.players[G.turn].name;
+    who.className = 'who p' + G.turn;
+  } else who.hidden = true;
+  $('panel-result').hidden = true;
+  $('panel-guess').hidden = false;
+  const q = $('quit'); q.textContent = 'Salir'; q.dataset.arm = '0';
+  setPrice(START_PRICE);
+}
+
+function lock(){
+  G.guesses[G.turn] = price;
+  if (G.mode === 'versus' && G.turn === 0){
+    G.turn = 1;
+    $('pass-from').textContent = G.players[0].name;
+    $('pass-name').textContent = G.players[1].name;
+    show('pass');
+    return;
+  }
+  settle();
+}
+
+function settle(){
+  const it = PRODUCTS[G.items[G.round]];
+  const rows = G.players.map((p, i) => {
+    const g = G.guesses[i];
+    const r = roundScore(g, it.p);
+    const mult = multOf(p.streak);
+    const pts = Math.round((r.base + r.bonus) * mult);
+    p.total += pts; p.base += r.base;
+    p.streak = r.base >= 700 ? p.streak + 1 : 0;
+    return { i, name:p.name, guess:g, real:it.p, pts, base:r.base, bonus:r.bonus, mult, err:r.rel };
+  });
+  G.log.push({ idx:G.items[G.round], rows });
+  G.pips[G.round] = G.mode === 'versus' ? 'done' : (rows[0].base >= 700 ? 'good' : rows[0].base >= 350 ? 'mid' : 'bad');
+  renderResult(it, rows);
+}
+
+function trackHTML(real, guesses){
+  const lanes = guesses.length;
+  const rp = toPos(real) * 100;
+  let h = '<div class="rail" style="height:' + (30 + lanes * 34 + 6) + 'px">';
+  h += '<div class="rl" style="left:' + rp + '%"></div><div class="rt" style="left:' + rp + '%">' + esc(money(real)) + '</div>';
+  guesses.forEach((g, i) => {
+    const gp = toPos(clampPrice(g.guess)) * 100;
+    const top = 30 + i * 34;
+    h += '<div class="gap" style="left:' + Math.min(gp, rp) + '%;width:' + Math.abs(gp - rp) + '%;top:' + (top + 17) + 'px"></div>';
+    h += '<div class="pin pin' + g.cls + '" style="left:' + gp + '%;top:' + (top + 3) + 'px">' + esc(g.label) + '</div>';
+  });
+  h += '</div><div class="ticks">' + [10000, 50000, 100000, 500000, 1000000, 3000000].map(v =>
+    '<span style="left:' + (toPos(v) * 100) + '%">' + (v >= 1000000 ? (v / 1000000) + 'M' : (v / 1000) + 'k') + '</span>').join('') + '</div>';
+  return h;
+}
+
+function rowHTML(r){
+  const pct = Math.round(Math.abs(r.err) * 100);
+  const dir = pct === 0 ? 'Exacto' : pct + '% ' + (r.err > 0 ? 'de más' : 'de menos');
+  const parts = ['Base ' + fmt.format(r.base)];
+  if (r.bonus) parts.push('Clavado +' + r.bonus);
+  if (r.mult > 1) parts.push('Racha ' + multText(r.mult));
+  return '<div class="row p' + r.i + '"><div class="r-top"><span class="r-name">' + esc(G.mode === 'versus' ? r.name : 'Tu precio') +
+    '</span><span class="r-pts">+' + fmt.format(r.pts) + '</span></div><div class="r-mid"><b>' + esc(money(r.guess)) +
+    '</b><span>' + dir + '</span></div><div class="r-sub">' + esc(parts.join(' · ')) + '</div></div>';
+}
+
+function renderResult(it, rows){
+  const solo = G.mode !== 'versus';
+  $('panel-guess').hidden = true;
+  $('panel-result').hidden = false;
+  renderScores(); renderPips();
+  let verdict;
+  if (solo) verdict = verdictOf(rows[0]);
+  else if (rows[0].pts === rows[1].pts) verdict = 'Empate en la ronda';
+  else verdict = (rows[0].pts > rows[1].pts ? rows[0].name : rows[1].name) + ' se lleva la ronda';
+  $('r-verdict').textContent = verdict;
+  $('r-real').textContent = money(it.p);
+  $('r-ml').href = mlUrl(it);
+  $('r-track').innerHTML = trackHTML(it.p, rows.map(r => ({ guess:r.guess, cls:r.i, label:solo ? 'Vos' : r.name.slice(0, 7) })));
+  $('r-rows').innerHTML = rows.map(rowHTML).join('');
+  $('r-next').textContent = G.round + 1 >= G.n ? 'Ver resultado' : 'Siguiente producto';
+}
+
+function next(){
+  G.round++; G.turn = 0; G.guesses = [];
+  if (G.round >= G.n){ renderEnd(); show('end'); return; }
+  renderRound();
+}
+
+function shareText(){
+  if (G.mode === 'versus'){
+    const a = G.players[0], b = G.players[1];
+    return 'Pegale al Precio · Versus\n' + a.name + ' ' + fmt.format(a.total) + ' vs ' + b.name + ' ' + fmt.format(b.total) + '\n' +
+      (a.total === b.total ? 'Empate' : 'Ganó ' + (a.total > b.total ? a.name : b.name));
+  }
+  const p = G.players[0];
+  return 'Pegale al Precio · ' + MODES[G.mode].label + (G.mode === 'daily' ? ' ' + todayKey() : '') + '\n' +
+    fmt.format(p.total) + ' pts · ' + rankOf(p.base / G.n) + '\n' + G.log.map(l => sq(l.rows[0].base)).join('');
+}
+
+function renderEnd(){
+  const solo = G.mode !== 'versus';
+  $('e-mode').textContent = MODES[G.mode].label + ' · fin';
+  let note = '';
+  if (solo){
+    const p = G.players[0];
+    $('e-title').textContent = rankOf(p.base / G.n);
+    $('e-tag').hidden = false; $('e-scores').hidden = true;
+    $('e-score').textContent = fmt.format(p.total);
+    const best = +store.get('pap.best') || 0;
+    if (p.total > best){ store.set('pap.best', String(p.total)); note = best ? 'Nuevo récord personal' : 'Primer récord guardado'; }
+    if (G.mode === 'daily'){
+      const k = 'pap.daily.' + todayKey();
+      const prev = +store.get(k) || 0;
+      if (p.total > prev) store.set(k, String(p.total));
+      note = (note ? note + ' · ' : '') + 'Mejor de hoy: ' + fmt.format(Math.max(prev, p.total));
+    }
+  } else {
+    const a = G.players[0], b = G.players[1];
+    $('e-title').textContent = a.total === b.total ? 'Empate' : 'Ganó ' + (a.total > b.total ? a.name : b.name);
+    $('e-tag').hidden = true; $('e-scores').hidden = false;
+    $('e-scores').innerHTML = G.players.map((p, i) =>
+      '<div class="row p' + i + '"><div class="r-top"><span class="r-name">' + esc(p.name) + '</span><span class="r-pts">' + fmt.format(p.total) + '</span></div></div>').join('');
+  }
+  $('e-note').textContent = note;
+  $('e-recap').innerHTML = G.log.map(l => {
+    const it = PRODUCTS[l.idx];
+    return '<li><span class="rg">' + it.e + '</span><div class="rn"><b>' + esc(it.n) + '</b><small>Ref. ' + esc(money(it.p)) + ' · <a href="' + esc(mlUrl(it)) + '" target="_blank" rel="noopener noreferrer">Ver en ML</a></small></div><div class="rp">' +
+      l.rows.map(r => '<span class="p' + r.i + '">' + (G.mode === 'versus' ? esc(r.name.slice(0, 8)) + ' ' : '') + esc(money(r.guess)) + ' <em>+' + fmt.format(r.pts) + '</em></span>').join('') +
+      '</div></li>';
+  }).join('');
+  $('share-box').hidden = true;
+  $('e-copy').textContent = 'Copiar resultado';
+}
+
+async function copyResult(){
+  const text = shareText();
+  const btn = $('e-copy');
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = 'Copiado';
+    setTimeout(() => { btn.textContent = 'Copiar resultado'; }, 1800);
+  } catch (e) {
+    const box = $('share-box');
+    box.value = text; box.hidden = false; box.focus(); box.select();
+    btn.textContent = 'Seleccioná y copiá el texto';
+  }
+}
+
+/* ---------- Eventos ---------- */
+$('m-solo').addEventListener('click', () => startGame('solo'));
+$('m-daily').addEventListener('click', () => startGame('daily'));
+$('m-versus').addEventListener('click', () => show('versus'));
+$('v-start').addEventListener('click', () => {
+  const a = $('n1').value.trim() || 'Jugador 1';
+  const b = $('n2').value.trim() || 'Jugador 2';
+  startGame('versus', [a, b === a ? b + ' 2' : b]);
+});
+document.querySelectorAll('[data-home]').forEach(b => b.addEventListener('click', () => { renderHome(); show('home'); }));
+
+$('slider').addEventListener('input', () => {
+  price = fromPos($('slider').value / 1000);
+  $('amt').value = fmt.format(price);
+  paintFill();
+});
+$('amt').addEventListener('input', () => {
+  const n = parseInt($('amt').value.replace(/\D/g, ''), 10);
+  if (n) setPrice(n, true);
+});
+$('amt').addEventListener('change', () => { $('amt').value = fmt.format(price); });
+$('amt').addEventListener('blur', () => { $('amt').value = fmt.format(price); });
+document.querySelectorAll('.nudge button').forEach(b => b.addEventListener('click', () => setPrice(price * parseFloat(b.dataset.f))));
+$('lock').addEventListener('click', lock);
+$('r-next').addEventListener('click', next);
+$('pass-go').addEventListener('click', () => { renderRound(); show('game'); });
+$('e-again').addEventListener('click', () => startGame(G.mode, G.mode === 'versus' ? G.players.map(p => p.name) : undefined));
+$('e-copy').addEventListener('click', copyResult);
+$('quit').addEventListener('click', () => {
+  const b = $('quit');
+  if (b.dataset.arm === '1'){ clearTimeout(quitTimer); b.dataset.arm = '0'; b.textContent = 'Salir'; renderHome(); show('home'); }
+  else {
+    b.dataset.arm = '1'; b.textContent = 'Tocá de nuevo';
+    quitTimer = setTimeout(() => { b.dataset.arm = '0'; b.textContent = 'Salir'; }, 2500);
+  }
+});
+
+renderHome();
+show('home');
+setPrice(START_PRICE);
+</script>
+<script>
+(function () {
+  try {
+    if ('serviceWorker' in navigator && location.protocol === 'https:' && !window.Capacitor) {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    }
+  } catch (e) {}
+  try {
+    var App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if (App && App.addListener) {
+      App.addListener('backButton', function () {
+        if (!$('s-home').hidden) { App.exitApp(); return; }
+        if (!$('s-versus').hidden || !$('s-end').hidden) { renderHome(); show('home'); return; }
+        if (!$('s-game').hidden) { $('quit').click(); }
+      });
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

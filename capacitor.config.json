@@ -1,0 +1,8 @@
+{
+  "appId": "com.pegalealprecio.juego",
+  "appName": "Pegale al Precio",
+  "webDir": "docs",
+  "android": {
+    "backgroundColor": "#FFD60A"
+  }
+}
