@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Arma docs/products.json con publicaciones reales de Mercado Libre Argentina.
+ * Arma data/products.json con publicaciones reales de Mercado Libre Argentina.
  *
  *   node scripts/fetch-products.mjs          consulta la API y actualiza el archivo
  *   node scripts/fetch-products.mjs --seed   arma el archivo con los precios estimados del catálogo (sin red)
@@ -8,7 +8,7 @@
  * Variables de entorno (todas opcionales):
  *   ML_CLIENT_ID, ML_CLIENT_SECRET   credenciales de la app en developers.mercadolibre.com.ar
  *   ML_API_BASE                      para pruebas (por defecto https://api.mercadolibre.com)
- *   PRODUCTS_OUT                     archivo de salida (por defecto docs/products.json)
+ *   PRODUCTS_OUT                     archivo de salida (por defecto data/products.json)
  *   DELAY_MS                         pausa entre pedidos (por defecto 250)
  */
 import fs from 'node:fs';
@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const API = (process.env.ML_API_BASE || 'https://api.mercadolibre.com').replace(/\/$/, '');
 const SITE = 'MLA';
-const OUT = process.env.PRODUCTS_OUT || path.join(ROOT, 'docs/products.json');
+const OUT = process.env.PRODUCTS_OUT || path.join(ROOT, 'data/products.json');
 const DELAY = Number(process.env.DELAY_MS ?? 250);
 const MIN_CANDIDATES = 3;
 const SEED = process.argv.includes('--seed');

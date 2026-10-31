@@ -5,9 +5,22 @@ on:
   push:
     tags:
       - "v*"
+    branches:
+      - main
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "assets/**"
+      - "pubspec.yaml"
+      - "ci/**"
+      - ".github/workflows/build-apk.yml"
 
 permissions:
   contents: write
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   apk:
@@ -16,39 +29,61 @@ jobs:
       - name: Bajar el código
         uses: actions/checkout@v4
 
-      - name: Instalar Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - name: Instalar Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
 
-      - name: Instalar dependencias
-        run: npm install
+      - name: Instalar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
       - name: Crear el proyecto Android
-        run: npx cap add android
+        run: |
+          flutter --version 2>&1 | tee -a ci.log
+          flutter create --platforms=android --org com.pegalealprecio --project-name pegale_al_precio . 2>&1 | tee -a ci.log
+          rm -f test/widget_test.dart
 
-      - name: Generar los íconos de la app
+      - name: Configurar la app (nombre, internet, firma)
+        run: |
+          python3 - <<'PY'
+          import re
+          p = 'android/app/src/main/AndroidManifest.xml'
+          s = open(p, encoding='utf-8').read()
+          s = re.sub(r'android:label="[^"]*"', 'android:label="Pegale al Precio"', s, count=1)
+          extra = ('\n    <uses-permission android:name="android.permission.INTERNET"/>'
+                   '\n    <queries>\n        <intent>\n            <action android:name="android.intent.action.VIEW"/>\n'
+                   '            <data android:scheme="https"/>\n        </intent>\n    </queries>')
+          s = re.sub(r'(<manifest[^>]*>)', lambda m: m.group(1) + extra, s, count=1)
+          s = s.replace('<activity\n', '<activity\n            android:screenOrientation="portrait"\n', 1)
+          open(p, 'w', encoding='utf-8').write(s)
+          PY
+          mkdir -p ~/.android
+          cp ci/debug.keystore ~/.android/debug.keystore
+          grep -n "label\|INTERNET\|screenOrientation" android/app/src/main/AndroidManifest.xml | tee -a ci.log
+
+      - name: Bajar dependencias
+        run: flutter pub get 2>&1 | tee -a ci.log
+
+      - name: Generar los íconos
+        run: dart run flutter_launcher_icons 2>&1 | tee -a ci.log
+
+      - name: Revisar el código
         continue-on-error: true
-        run: npx capacitor-assets generate --android
+        run: flutter analyze 2>&1 | tee -a ci.log
 
-      - name: Dejar la app en vertical
-        run: sed -i 's|android:name=".MainActivity"|android:name=".MainActivity" android:screenOrientation="portrait"|' android/app/src/main/AndroidManifest.xml
-
-      - name: Copiar el juego al proyecto
-        run: npx cap sync android
+      - name: Probar la lógica del juego
+        continue-on-error: true
+        run: flutter test 2>&1 | tee -a ci.log
 
       - name: Compilar el APK
-        working-directory: android
-        run: ./gradlew assembleDebug
+        run: flutter build apk --release 2>&1 | tee -a ci.log
 
       - name: Dar nombre al archivo
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk pegale-al-precio.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk pegale-al-precio.apk
 
       - name: Guardar el APK en la corrida
         uses: actions/upload-artifact@v4
@@ -61,3 +96,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: pegale-al-precio.apk
+
+      - name: Guardar el registro de la compilación
+        if: always()
+        run: |
+          mkdir -p /tmp/cilog
+          cp ci.log /tmp/cilog/ci.log 2>/dev/null || echo "sin registro" > /tmp/cilog/ci.log
+          cd /tmp/cilog
+          git init -q
+          git checkout -q -b ci-log
+          git add ci.log
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "registro de la compilación ${GITHUB_RUN_ID}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ci-log

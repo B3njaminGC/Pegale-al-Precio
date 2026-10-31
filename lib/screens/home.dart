@@ -1,0 +1,212 @@
+import 'package:flutter/material.dart';
+
+import '../core.dart';
+import '../env.dart';
+import '../theme.dart';
+import '../widgets.dart';
+import 'play.dart';
+import 'rank.dart';
+import 'rooms.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key, this.initFailed = false});
+  final bool initFailed;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  Future<void> _refresh() async {
+    if (widget.initFailed && env.products.isEmpty) {
+      try {
+        await env.init();
+      } catch (_) {}
+    }
+    final newer = await env.refreshProducts();
+    if (newer) {
+      env.applyDownloaded();
+    }
+    if (mounted) setState(() {});
+  }
+
+  String get _fine {
+    var d = '';
+    if (env.updated.isNotEmpty) {
+      final t = DateTime.tryParse(env.updated);
+      if (t != null) d = prettyDate(arDateKey(t));
+    }
+    if (env.source == 'api.mercadolibre.com') {
+      return 'Precios de publicaciones reales de Mercado Libre Argentina, actualizados el $d. Juego independiente, sin relación con Mercado Libre.';
+    }
+    return 'Precios de referencia estimados${d.isEmpty ? '' : ' al $d'}. Juego independiente, sin relación con Mercado Libre.';
+  }
+
+  Future<void> _go(Route<void> route) async {
+    await Navigator.of(context).push(route);
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (env.products.isEmpty) {
+      return Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Text('No se pudieron cargar los productos.', style: sans(18, w: FontWeight.w700), textAlign: TextAlign.center),
+                const SizedBox(height: 8),
+                Text('Revisá tu conexión y probá de nuevo.', style: sans(14, color: C.muted), textAlign: TextAlign.center),
+                const SizedBox(height: 20),
+                SizedBox(width: 200, child: PrimaryButton('Reintentar', onPressed: _refresh)),
+              ]),
+            ),
+          ),
+        ),
+      );
+    }
+    final key = arDateKey();
+    final rec = env.getJson('pap.daily.$key');
+    final played = rec is Map && rec['score'] is num;
+    final sheet = dailyItems(env.products, key, 5).take(3).toList();
+
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
+          children: [
+            Row(children: [
+              Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: C.accent, width: 3)),
+              ),
+              const SizedBox(width: 10),
+              Text('Pegale al Precio', style: sans(17, w: FontWeight.w700)),
+              const Spacer(),
+              TextButton(
+                onPressed: () => _go(MaterialPageRoute<void>(builder: (_) => const RankScreen())),
+                child: Text('Ranking', style: sans(15, color: C.muted)),
+              ),
+            ]),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: C.line2),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF16233B), Color(0xFF0D1524)],
+                ),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Kicker('Desafío del día · ${prettyDate(key)}'),
+                const SizedBox(height: 12),
+                Row(children: [
+                  for (var i = 0; i < sheet.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 8),
+                    Expanded(child: Plate(sheet[i], aspect: 1, radius: 12, pad: 8, small: true)),
+                  ],
+                ]),
+                const SizedBox(height: 16),
+                Text('5 productos.\nUn solo intento\ncuenta.', style: sans(32, w: FontWeight.w800, ls: -1, h: 1.05)),
+                const SizedBox(height: 10),
+                Text(
+                  played
+                      ? 'Hoy hiciste ${num0(rec['score'] as num)} puntos. Podés volver a jugar de práctica.'
+                      : 'En el ranking cuenta tu primera partida del día.',
+                  style: mono(12, color: C.muted),
+                ),
+                const SizedBox(height: 16),
+                PrimaryButton('Jugar el desafío', onPressed: () => _go(PlayScreen.dailyRoute())),
+              ]),
+            ),
+            const SizedBox(height: 12),
+            Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Expanded(
+                child: _Tile(
+                  title: 'Partida rápida',
+                  sub: '8 productos al azar',
+                  onTap: () => _go(PlayScreen.quickRoute()),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _Tile(
+                  title: 'Sala online',
+                  sub: 'Jugá con amigos, cada uno a su hora',
+                  onTap: () => _go(MaterialPageRoute<void>(builder: (_) => const RoomsScreen())),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 22),
+            const _How('01', 'Mirá el producto.', 'Foto y ficha técnica, sin el precio.'),
+            const _How('02', 'Fijá tu precio.', 'Cuanto más cerca, más puntos. Las rachas multiplican.'),
+            const _How('03', 'Compará.', 'Se revela el precio real y podés ir a la publicación.'),
+            const SizedBox(height: 10),
+            Text(_fine, style: sans(12, color: C.faint, h: 1.4)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Tile extends StatelessWidget {
+  const _Tile({required this.title, required this.sub, required this.onTap});
+  final String title;
+  final String sub;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Material(
+        color: C.surface,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            constraints: const BoxConstraints(minHeight: 112),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: C.line)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: sans(17, w: FontWeight.w700)),
+              const SizedBox(height: 22),
+              Text(sub, style: sans(13, color: C.muted, h: 1.3)),
+            ]),
+          ),
+        ),
+      );
+}
+
+class _How extends StatelessWidget {
+  const _How(this.n, this.title, this.text);
+  final String n;
+  final String title;
+  final String text;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SizedBox(width: 30, child: Padding(padding: const EdgeInsets.only(top: 2), child: Text(n, style: mono(11, color: C.accent)))),
+          Expanded(
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(text: '$title ', style: sans(14, w: FontWeight.w600)),
+                TextSpan(text: text, style: sans(14, color: C.muted)),
+              ]),
+              style: const TextStyle(height: 1.4),
+            ),
+          ),
+        ]),
+      );
+}
