@@ -1,0 +1,548 @@
+{
+  "version": 1,
+  "updated": "2026-10-30T01:53:01.218Z",
+  "site": "MLA",
+  "source": "estimado",
+  "items": [
+    {
+      "id": "iphone-17",
+      "n": "iPhone 17 256 GB",
+      "c": "Celulares",
+      "s": [
+        "256 GB de almacenamiento",
+        "Pantalla OLED de 6,3\" a 120 Hz",
+        "Cámara frontal de 18 MP"
+      ],
+      "p": 1900000,
+      "src": "estimado"
+    },
+    {
+      "id": "galaxy-s25",
+      "n": "Samsung Galaxy S25",
+      "c": "Celulares",
+      "s": [
+        "Pantalla AMOLED de 6,2\"",
+        "Cámara principal de 50 MP",
+        "256 GB de almacenamiento"
+      ],
+      "p": 1400000,
+      "src": "estimado"
+    },
+    {
+      "id": "moto-g",
+      "n": "Motorola Moto G",
+      "c": "Celulares",
+      "s": [
+        "Pantalla de 6,7\" a 120 Hz",
+        "128 GB y 4 GB de RAM",
+        "Batería de 5.000 mAh"
+      ],
+      "p": 280000,
+      "src": "estimado"
+    },
+    {
+      "id": "redmi-note",
+      "n": "Xiaomi Redmi Note",
+      "c": "Celulares",
+      "s": [
+        "Pantalla AMOLED de 6,67\"",
+        "Cámara principal de 108 MP",
+        "Carga rápida de 33 W"
+      ],
+      "p": 420000,
+      "src": "estimado"
+    },
+    {
+      "id": "ps5-slim",
+      "n": "PlayStation 5 Slim con lectora",
+      "c": "Consolas",
+      "s": [
+        "SSD de 1 TB",
+        "Salida 4K hasta 120 Hz",
+        "Incluye un joystick DualSense"
+      ],
+      "p": 1150000,
+      "src": "estimado"
+    },
+    {
+      "id": "switch-2",
+      "n": "Nintendo Switch 2",
+      "c": "Consolas",
+      "s": [
+        "Pantalla LCD de 7,9\" a 120 Hz",
+        "256 GB de almacenamiento",
+        "Joy-Con magnéticos"
+      ],
+      "p": 950000,
+      "src": "estimado"
+    },
+    {
+      "id": "airpods-pro-2",
+      "n": "AirPods Pro 2",
+      "c": "Audio",
+      "s": [
+        "Cancelación activa de ruido",
+        "Estuche con carga USB-C",
+        "Hasta 6 h de batería por carga"
+      ],
+      "p": 380000,
+      "src": "estimado"
+    },
+    {
+      "id": "sony-xm5",
+      "n": "Sony WH-1000XM5",
+      "c": "Audio",
+      "s": [
+        "Auriculares over-ear con cancelación de ruido",
+        "Hasta 30 h de batería",
+        "Bluetooth 5.2"
+      ],
+      "p": 520000,
+      "src": "estimado"
+    },
+    {
+      "id": "jbl-flip-6",
+      "n": "Parlante JBL Flip 6",
+      "c": "Audio",
+      "s": [
+        "Bluetooth, resistente al agua IP67",
+        "Hasta 12 h de batería",
+        "Sonido estéreo de 2 vías"
+      ],
+      "p": 190000,
+      "src": "estimado"
+    },
+    {
+      "id": "macbook-air-m4",
+      "n": "MacBook Air 13\" M4",
+      "c": "Computación",
+      "s": [
+        "Chip M4",
+        "16 GB de RAM y 256 GB de SSD",
+        "Pantalla Liquid Retina de 13,6\""
+      ],
+      "p": 2000000,
+      "src": "estimado"
+    },
+    {
+      "id": "notebook-i5",
+      "n": "Notebook Core i5",
+      "c": "Computación",
+      "s": [
+        "Intel Core i5",
+        "16 GB de RAM y 512 GB de SSD",
+        "Pantalla Full HD de 15,6\""
+      ],
+      "p": 950000,
+      "src": "estimado"
+    },
+    {
+      "id": "ipad-a16",
+      "n": "iPad 11\" (A16)",
+      "c": "Tablets",
+      "s": [
+        "Pantalla Liquid Retina de 11\"",
+        "128 GB de almacenamiento",
+        "Chip A16"
+      ],
+      "p": 650000,
+      "src": "estimado"
+    },
+    {
+      "id": "kindle-paperwhite",
+      "n": "Kindle Paperwhite",
+      "c": "Lectura",
+      "s": [
+        "Pantalla de 7\" sin reflejos",
+        "16 GB de almacenamiento",
+        "Resistente al agua IPX8"
+      ],
+      "p": 300000,
+      "src": "estimado"
+    },
+    {
+      "id": "apple-watch-s11",
+      "n": "Apple Watch Series 11",
+      "c": "Relojes",
+      "s": [
+        "Caja de aluminio de 42 mm",
+        "GPS",
+        "Pantalla siempre activa"
+      ],
+      "p": 750000,
+      "src": "estimado"
+    },
+    {
+      "id": "casio-f91w",
+      "n": "Casio F-91W",
+      "c": "Relojes",
+      "s": [
+        "Reloj digital con correa de resina",
+        "Cronómetro y alarma diaria",
+        "Resistente a salpicaduras"
+      ],
+      "p": 35000,
+      "src": "estimado"
+    },
+    {
+      "id": "gopro-hero13",
+      "n": "GoPro HERO13 Black",
+      "c": "Cámaras",
+      "s": [
+        "Video 5,3K a 60 fps",
+        "Sumergible hasta 10 m",
+        "Pantalla frontal y trasera"
+      ],
+      "p": 650000,
+      "src": "estimado"
+    },
+    {
+      "id": "dji-mini-4-pro",
+      "n": "Dron DJI Mini 4 Pro",
+      "c": "Cámaras",
+      "s": [
+        "Menos de 249 g",
+        "Video 4K HDR a 60 fps",
+        "Hasta 34 min de vuelo"
+      ],
+      "p": 1350000,
+      "src": "estimado"
+    },
+    {
+      "id": "monitor-gamer-27",
+      "n": "Monitor gamer 27\"",
+      "c": "Computación",
+      "s": [
+        "Panel IPS de 1440p",
+        "165 Hz y 1 ms",
+        "Compatible con FreeSync"
+      ],
+      "p": 430000,
+      "src": "estimado"
+    },
+    {
+      "id": "teclado-mecanico-75",
+      "n": "Teclado mecánico 75%",
+      "c": "Computación",
+      "s": [
+        "Switches lineales intercambiables",
+        "Conexión Bluetooth y cable",
+        "Retroiluminación RGB"
+      ],
+      "p": 140000,
+      "src": "estimado"
+    },
+    {
+      "id": "mx-master-3s",
+      "n": "Logitech MX Master 3S",
+      "c": "Computación",
+      "s": [
+        "Sensor de 8.000 DPI",
+        "Rueda magnética silenciosa",
+        "Hasta 70 días de batería"
+      ],
+      "p": 170000,
+      "src": "estimado"
+    },
+    {
+      "id": "ssd-portatil-1tb",
+      "n": "SSD portátil de 1 TB",
+      "c": "Computación",
+      "s": [
+        "USB-C, hasta 1.050 MB/s",
+        "Carcasa de aluminio",
+        "Resistente a golpes"
+      ],
+      "p": 150000,
+      "src": "estimado"
+    },
+    {
+      "id": "rtx-5070",
+      "n": "GeForce RTX 5070",
+      "c": "Componentes",
+      "s": [
+        "12 GB de memoria GDDR7",
+        "Arquitectura Blackwell",
+        "Compatible con DLSS 4"
+      ],
+      "p": 1100000,
+      "src": "estimado"
+    },
+    {
+      "id": "tv-qled-55",
+      "n": "Smart TV QLED 55\"",
+      "c": "Televisores",
+      "s": [
+        "55 pulgadas, resolución 4K",
+        "Panel QLED de 60 Hz",
+        "Google TV integrado"
+      ],
+      "p": 750000,
+      "src": "estimado"
+    },
+    {
+      "id": "power-bank-20000",
+      "n": "Batería externa 20.000 mAh",
+      "c": "Accesorios",
+      "s": [
+        "Carga rápida de 22,5 W",
+        "2 puertos USB-C y 1 USB-A",
+        "Indicador digital de carga"
+      ],
+      "p": 60000,
+      "src": "estimado"
+    },
+    {
+      "id": "silla-gamer",
+      "n": "Silla gamer reclinable",
+      "c": "Hogar",
+      "s": [
+        "Respaldo reclinable hasta 180°",
+        "Apoyabrazos 3D regulables",
+        "Soporta hasta 120 kg"
+      ],
+      "p": 300000,
+      "src": "estimado"
+    },
+    {
+      "id": "dyson-v15",
+      "n": "Dyson V15 Detect",
+      "c": "Hogar",
+      "s": [
+        "Aspiradora inalámbrica, hasta 60 min",
+        "Láser que revela el polvo",
+        "Pantalla con conteo de partículas"
+      ],
+      "p": 1300000,
+      "src": "estimado"
+    },
+    {
+      "id": "robot-aspirador",
+      "n": "Aspiradora robot con mapeo",
+      "c": "Hogar",
+      "s": [
+        "Mapeo láser",
+        "Succión de 2.500 Pa",
+        "Hasta 150 min de autonomía"
+      ],
+      "p": 450000,
+      "src": "estimado"
+    },
+    {
+      "id": "heladera-350",
+      "n": "Heladera no frost 350 L",
+      "c": "Electrodomésticos",
+      "s": [
+        "Capacidad de 350 litros",
+        "Freezer superior no frost",
+        "Eficiencia energética A"
+      ],
+      "p": 900000,
+      "src": "estimado"
+    },
+    {
+      "id": "lavarropas-8kg",
+      "n": "Lavarropas carga frontal 8 kg",
+      "c": "Electrodomésticos",
+      "s": [
+        "Capacidad de 8 kg",
+        "1.000 rpm de centrifugado",
+        "Eficiencia energética A"
+      ],
+      "p": 750000,
+      "src": "estimado"
+    },
+    {
+      "id": "aire-split",
+      "n": "Aire acondicionado split inverter",
+      "c": "Electrodomésticos",
+      "s": [
+        "Frío y calor, 3.000 frigorías",
+        "Tecnología inverter",
+        "Eficiencia energética A"
+      ],
+      "p": 850000,
+      "src": "estimado"
+    },
+    {
+      "id": "olla-multifuncion",
+      "n": "Olla eléctrica multifunción 6 L",
+      "c": "Cocina",
+      "s": [
+        "Capacidad de 6 litros",
+        "Cocción a presión y slow cooker",
+        "Acero inoxidable"
+      ],
+      "p": 110000,
+      "src": "estimado"
+    },
+    {
+      "id": "freidora-aire",
+      "n": "Freidora de aire 5,5 L",
+      "c": "Cocina",
+      "s": [
+        "Canasta de 5,5 L",
+        "Hasta 200 °C",
+        "Temporizador de 60 min"
+      ],
+      "p": 95000,
+      "src": "estimado"
+    },
+    {
+      "id": "cafetera-espresso",
+      "n": "Cafetera espresso",
+      "c": "Cocina",
+      "s": [
+        "Bomba de 15 bares",
+        "Vaporizador de leche",
+        "Tanque de 1,5 L"
+      ],
+      "p": 280000,
+      "src": "estimado"
+    },
+    {
+      "id": "pava-electrica",
+      "n": "Pava eléctrica 1,7 L",
+      "c": "Cocina",
+      "s": [
+        "Acero inoxidable",
+        "Corte automático",
+        "1.800 W de potencia"
+      ],
+      "p": 40000,
+      "src": "estimado"
+    },
+    {
+      "id": "termo-stanley",
+      "n": "Termo Stanley Classic 1,2 L",
+      "c": "Mate",
+      "s": [
+        "Acero inoxidable de pared doble",
+        "Tapa que sirve de vaso",
+        "Capacidad de 1,2 litros"
+      ],
+      "p": 140000,
+      "src": "estimado"
+    },
+    {
+      "id": "stanley-quencher",
+      "n": "Stanley Quencher 40 oz",
+      "c": "Accesorios",
+      "s": [
+        "Vaso térmico de acero inoxidable",
+        "1,18 L con manija",
+        "Mantiene el frío hasta 11 horas"
+      ],
+      "p": 100000,
+      "src": "estimado"
+    },
+    {
+      "id": "bici-mtb-29",
+      "n": "Bicicleta MTB rodado 29",
+      "c": "Deportes",
+      "s": [
+        "Cuadro de aluminio",
+        "21 velocidades",
+        "Frenos a disco mecánicos"
+      ],
+      "p": 450000,
+      "src": "estimado"
+    },
+    {
+      "id": "pelota-futbol-5",
+      "n": "Pelota de fútbol N°5",
+      "c": "Deportes",
+      "s": [
+        "Tamaño 5 reglamentario",
+        "Cuero sintético cosido a máquina",
+        "Cámara de butilo"
+      ],
+      "p": 40000,
+      "src": "estimado"
+    },
+    {
+      "id": "carpa-4",
+      "n": "Carpa para 4 personas",
+      "c": "Camping",
+      "s": [
+        "Doble techo impermeable",
+        "Armado con 2 varillas",
+        "Pesa 4,5 kg"
+      ],
+      "p": 200000,
+      "src": "estimado"
+    },
+    {
+      "id": "mochila-trekking-50",
+      "n": "Mochila de trekking 50 L",
+      "c": "Camping",
+      "s": [
+        "Espalda ventilada",
+        "Funda de lluvia incluida",
+        "Arnés regulable"
+      ],
+      "p": 180000,
+      "src": "estimado"
+    },
+    {
+      "id": "nike-pegasus-41",
+      "n": "Nike Pegasus 41",
+      "c": "Indumentaria",
+      "s": [
+        "Zapatillas de running",
+        "Espuma ReactX",
+        "Pesan unos 285 g"
+      ],
+      "p": 230000,
+      "src": "estimado"
+    },
+    {
+      "id": "air-force-1",
+      "n": "Nike Air Force 1 '07",
+      "c": "Indumentaria",
+      "s": [
+        "Cuero blanco",
+        "Cámara de aire en la suela",
+        "Modelo clásico de 1982"
+      ],
+      "p": 190000,
+      "src": "estimado"
+    },
+    {
+      "id": "levis-501",
+      "n": "Jean Levi's 501",
+      "c": "Indumentaria",
+      "s": [
+        "100% algodón denim",
+        "Corte recto",
+        "Cierre con botones"
+      ],
+      "p": 130000,
+      "src": "estimado"
+    },
+    {
+      "id": "squier-stratocaster",
+      "n": "Guitarra Squier Stratocaster",
+      "c": "Música",
+      "s": [
+        "3 micrófonos single-coil",
+        "Mástil de arce",
+        "Cuerpo de álamo"
+      ],
+      "p": 420000,
+      "src": "estimado"
+    },
+    {
+      "id": "ukelele-soprano",
+      "n": "Ukelele soprano",
+      "c": "Música",
+      "s": [
+        "Cuerpo de caoba",
+        "4 cuerdas de nylon",
+        "Incluye funda"
+      ],
+      "p": 70000,
+      "src": "estimado"
+    }
+  ]
+}

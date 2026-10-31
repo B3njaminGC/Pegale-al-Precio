@@ -1,0 +1,43 @@
+name: Actualizar productos
+
+on:
+  schedule:
+    - cron: "5 3 * * *"   # todos los días a las 00:05 de Argentina
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-products
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bajar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Traer productos de Mercado Libre
+        env:
+          ML_CLIENT_ID: ${{ secrets.ML_CLIENT_ID }}
+          ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
+        run: node scripts/fetch-products.mjs
+
+      - name: Guardar los cambios
+        run: |
+          if git diff --quiet -- docs/products.json; then
+            echo "Sin cambios."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/products.json
+          git commit -m "Actualiza productos y precios"
+          git push
