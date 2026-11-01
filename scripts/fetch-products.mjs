@@ -144,6 +144,7 @@ async function resolve(entry) {
   const prods = results.filter(r => passes(entry, { title: r.name || '', price: entry.est, currency_id: 'ARS' })).slice(0, 3);
 
   const offers = [];
+  let rawOffers = 0;
   for (const p of prods) {
     await sleep(DELAY);
     let list;
@@ -153,6 +154,7 @@ async function resolve(entry) {
       if (e instanceof ApiError && (e.status === 404 || e.status === 400)) continue; // producto sin ofertas
       throw e;
     }
+    rawOffers += list.length;
     for (const o of list) {
       if (o.condition && o.condition !== 'new') continue;
       if (!passes(entry, { title: p.name, price: o.price, currency_id: o.currency_id })) continue;
@@ -160,7 +162,9 @@ async function resolve(entry) {
     }
   }
   if (offers.length < MIN_CANDIDATES) {
-    throw new Error(`solo ${offers.length} publicaciones sirven de ${results.length} productos encontrados`);
+    const names = results.slice(0, 6).map(r => String(r.name || '').slice(0, 45)).join(' / ');
+    const precios = prods.length && !rawOffers ? ', sin ofertas' : '';
+    throw new Error(`solo ${offers.length} publicaciones sirven de ${results.length} productos encontrados (${prods.length} con nombre válido, ${rawOffers} ofertas${precios}). Primeros: ${names}`);
   }
   const chosen = pickMedian(offers);
 
