@@ -202,7 +202,12 @@ class _EndScreenState extends State<EndScreen> {
             Text(rankOf(g.base / g.items.length), style: sans(34, w: FontWeight.w800, ls: -1, h: 1.05)),
             const SizedBox(height: 6),
             Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
-              Text(num0(g.total), style: mono(44, w: FontWeight.w700, color: C.accent)),
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: g.total.toDouble()),
+                duration: const Duration(milliseconds: 1100),
+                curve: Curves.easeOutCubic,
+                builder: (c, v, _) => Text(num0(v), style: mono(44, w: FontWeight.w700, color: C.accent)),
+              ),
               const SizedBox(width: 8),
               Text('puntos', style: sans(15, color: C.muted)),
             ]),

@@ -95,6 +95,11 @@ class _PlayScreenState extends State<PlayScreen> {
     _focus.unfocus();
     final it = game.current;
     final e = game.guess(price);
+    if (e.base >= 700) {
+      HapticFeedback.heavyImpact();
+    } else {
+      HapticFeedback.mediumImpact();
+    }
     if (widget.mode == 'room' && widget.roomCode != null) {
       env.setJson('pap.room.${widget.roomCode}', game.toJson());
       env.net.pushProgress(widget.roomCode!, {'round': game.round}).catchError((Object _) {});
@@ -227,7 +232,12 @@ class _PlayScreenState extends State<PlayScreen> {
       const SizedBox(width: 12),
       Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text('PUNTOS', style: mono(10, color: C.faint, ls: 1.2)),
-        Text(num0(game.total), style: mono(20, w: FontWeight.w700)),
+        TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: game.total.toDouble()),
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.easeOutCubic,
+          builder: (c, v, _) => Text(num0(v), style: mono(20, w: FontWeight.w700)),
+        ),
       ]),
     ]);
   }
@@ -353,7 +363,16 @@ class _PlayScreenState extends State<PlayScreen> {
     if (e.mult > 1) br.add('Racha ×${_mult(e.mult)}');
     final delta = e.err.abs() < 0.005 ? 'Clavaste el precio' : '${pct(e.err)} ${e.err > 0 ? 'más caro' : 'más barato'}';
     final hasLink = it.link != null;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return TweenAnimationBuilder<double>(
+      key: ValueKey<int>(game.round),
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutCubic,
+      builder: (c, t, child) => Opacity(
+        opacity: t.clamp(0.0, 1.0).toDouble(),
+        child: Transform.translate(offset: Offset(0, 18 * (1 - t)), child: child),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Expanded(child: Text(verdictOf(e.base, e.bonus), style: sans(32, w: FontWeight.w800, ls: -0.8, color: tc))),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -400,7 +419,8 @@ class _PlayScreenState extends State<PlayScreen> {
       const SizedBox(height: 10),
       PrimaryButton(sending ? 'Enviando…' : (game.done ? 'Ver resultado' : 'Siguiente producto'),
           onPressed: sending ? null : _next),
-    ]);
+    ]),
+    );
   }
 }
 

@@ -111,16 +111,23 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Kicker('Desafío del día · ${prettyDate(key)}'),
-                const SizedBox(height: 12),
-                Row(children: [
-                  for (var i = 0; i < sheet.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 8),
-                    Expanded(child: Plate(sheet[i], aspect: 1, radius: 12, pad: 8, small: true)),
-                  ],
-                ]),
-                const SizedBox(height: 16),
-                Text('5 productos.\nUn solo intento\ncuenta.', style: sans(32, w: FontWeight.w800, ls: -1, h: 1.05)),
-                const SizedBox(height: 10),
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 176,
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text('5 productos.\nUn solo\nintento\ncuenta.',
+                            style: sans(30, w: FontWeight.w800, ls: -1, h: 1.04)),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    _Fan(items: sheet),
+                  ]),
+                ),
+                const SizedBox(height: 14),
                 Text(
                   played
                       ? 'Hoy hiciste ${num0(rec['score'] as num)} puntos. Podés volver a jugar de práctica.'
@@ -136,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Expanded(
                 child: _Tile(
+                  icon: Icons.bolt_rounded,
                   title: 'Partida rápida',
                   sub: '8 productos al azar',
                   onTap: () => _go(PlayScreen.quickRoute()),
@@ -144,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: _Tile(
+                  icon: Icons.groups_rounded,
                   title: 'Sala online',
                   sub: 'Jugá con amigos, cada uno a su hora',
                   onTap: () => _go(MaterialPageRoute<void>(builder: (_) => const RoomsScreen())),
@@ -165,7 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _Tile extends StatelessWidget {
-  const _Tile({required this.title, required this.sub, required this.onTap});
+  const _Tile({required this.icon, required this.title, required this.sub, required this.onTap});
+  final IconData icon;
   final String title;
   final String sub;
   final VoidCallback onTap;
@@ -181,8 +191,15 @@ class _Tile extends StatelessWidget {
             constraints: const BoxConstraints(minHeight: 112),
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: C.line)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(color: const Color(0xFF16304D), borderRadius: BorderRadius.circular(12)),
+                child: Icon(icon, color: C.accent, size: 22),
+              ),
+              const SizedBox(height: 14),
               Text(title, style: sans(17, w: FontWeight.w700)),
-              const SizedBox(height: 22),
+              const SizedBox(height: 4),
               Text(sub, style: sans(13, color: C.muted, h: 1.3)),
             ]),
           ),
@@ -211,4 +228,49 @@ class _How extends StatelessWidget {
           ),
         ]),
       );
+}
+
+/// Tres cartas abanicadas con los productos del día. Se abren al entrar.
+class _Fan extends StatelessWidget {
+  const _Fan({required this.items});
+  final List<Product> items;
+
+  Widget _card(Product p, double angle, double t) {
+    return Transform.rotate(
+      angle: angle * t,
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        width: 92,
+        height: 128,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFFFFFFF), width: 2),
+          boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 14, offset: Offset(0, 6))],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Plate(p, aspect: 92 / 128, radius: 0, pad: 8, small: true),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.length < 3) return const SizedBox(width: 150);
+    return SizedBox(
+      width: 150,
+      height: 176,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeOutBack,
+        builder: (context, t, _) => Stack(clipBehavior: Clip.none, children: [
+          Positioned(left: 2, top: 26, child: _card(items[0], -0.24, t)),
+          Positioned(right: 2, top: 26, child: _card(items[2], 0.24, t)),
+          Positioned(left: 29, top: 8 - 8 * t, child: _card(items[1], 0, t)),
+        ]),
+      ),
+    );
+  }
 }

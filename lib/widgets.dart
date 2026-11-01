@@ -161,9 +161,11 @@ class Plate extends StatelessWidget {
   };
 
   /// Sin foto: un ícono de la categoría, sin texto, para que la placa no quede vacía ni desprolija.
-  Widget _placeholder() => Center(
-        child: Icon(_icons[product.c] ?? Icons.sell_rounded, size: small ? 30 : 76, color: const Color(0xFF9AA8C2)),
-      );
+  Widget _placeholder() => LayoutBuilder(builder: (context, c) {
+        final side = c.maxWidth < c.maxHeight ? c.maxWidth : c.maxHeight;
+        final size = (side.isFinite ? side * 0.42 : 56.0).clamp(22.0, 80.0).toDouble();
+        return Center(child: Icon(_icons[product.c] ?? Icons.sell_rounded, size: size, color: const Color(0xFF9AA8C2)));
+      });
 
   @override
   Widget build(BuildContext context) {
