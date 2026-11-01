@@ -75,7 +75,7 @@ test('actualiza los 45 productos con precio mediano, foto y link', async () => {
     assert.deepEqual(it.s, e.s);
   }
   assert.equal(mock.calls.search.length, 45);
-  assert.ok(mock.calls.search.every(c => c.limit === '20' && c.site === 'MLA'));
+  assert.ok(mock.calls.search.every(c => c.limit === '30' && c.site === 'MLA'));
 });
 
 test('si un producto falla conserva el dato anterior y sigue con el resto', async () => {

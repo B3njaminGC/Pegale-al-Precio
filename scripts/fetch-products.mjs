@@ -137,15 +137,19 @@ const pictureOf = p => {
 };
 
 async function resolve(entry) {
-  const qs = new URLSearchParams({ status: 'active', site_id: SITE, q: entry.q, limit: '20' });
+  const qs = new URLSearchParams({ status: 'active', site_id: SITE, q: entry.q, limit: '30' });
   const search = await getJson(`/products/search?${qs}`);
   const results = search.results || [];
   // el nombre del producto tiene que tener las palabras pedidas y ninguna prohibida
-  const prods = results.filter(r => passes(entry, { title: r.name || '', price: entry.est, currency_id: 'ARS' })).slice(0, 3);
+  const prods = results.filter(r => passes(entry, { title: r.name || '', price: entry.est, currency_id: 'ARS' }));
 
   const offers = [];
   let rawOffers = 0;
+  let tried = 0;
   for (const p of prods) {
+    // muchos productos del catálogo no tienen ofertas activas: se prueban hasta juntar suficientes
+    if (offers.length >= 8 || tried >= 12) break;
+    tried++;
     await sleep(DELAY);
     let list;
     try {
