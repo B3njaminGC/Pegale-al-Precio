@@ -1,5 +1,3 @@
-import 'dart:ui' show FontFeature;
-
 import 'package:flutter/material.dart';
 
 /// Dirección visual: sala de tasación de noche. Azul tinta, un solo celeste para actuar,

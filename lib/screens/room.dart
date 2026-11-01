@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../config.dart';
 import '../core.dart';
 import '../env.dart';
+import '../net.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import 'play.dart';
