@@ -32,6 +32,18 @@ class PapApp extends StatelessWidget {
         title: 'Pegale al Precio',
         debugShowCheckedModeBanner: false,
         theme: buildTheme(),
+        scrollBehavior: const _FirmScroll(),
         home: HomeScreen(initFailed: initFailed),
       );
+}
+
+/// Scroll que frena en los bordes: sin estirarse ni seguir de largo al llegar al final.
+class _FirmScroll extends MaterialScrollBehavior {
+  const _FirmScroll();
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) => const ClampingScrollPhysics();
+
+  @override
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) => child;
 }

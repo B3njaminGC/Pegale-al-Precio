@@ -11,3 +11,6 @@ const String kProductsUrl =
 
 /// Dónde bajar la app. Se incluye en el texto que se comparte.
 const String kDownloadUrl = 'https://github.com/B3njaminGC/Pegale-al-Precio/releases/latest';
+
+/// Versión de esta compilación (la completa el workflow). Se muestra al pie del inicio.
+const String kVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'dev');

@@ -104,7 +104,7 @@ jobs:
         run: flutter test 2>&1 | tee -a ci.log
 
       - name: Compilar el APK
-        run: flutter build apk --release --build-number=${{ github.run_number }} 2>&1 | tee -a ci.log
+        run: flutter build apk --release --build-number=${{ github.run_number }} --dart-define=APP_VERSION=${{ inputs.version || format('b{0}', github.run_number) }} 2>&1 | tee -a ci.log
 
       - name: Dar nombre al archivo y mostrar la firma
         run: |

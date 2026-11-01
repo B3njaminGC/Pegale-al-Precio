@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../config.dart';
 import '../core.dart';
 import '../env.dart';
 import '../theme.dart';
@@ -166,6 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const _How('03', 'Compará.', 'Se revela el precio real y podés ir a la publicación.'),
             const SizedBox(height: 10),
             Text(_fine, style: sans(12, color: C.faint, h: 1.4)),
+            const SizedBox(height: 6),
+            Text('Versión $kVersion', style: mono(11, color: C.faint)),
           ],
         ),
       ),
