@@ -56,7 +56,9 @@ class Env {
     if (doc is! Map) return false;
     final list = parseProducts(doc['items']);
     if (list.length < 8) return false;
-    products = list;
+    // Si hay suficientes productos con precio y foto reales, se juega solo con esos.
+    final live = list.where((p) => p.live).toList();
+    products = live.length >= 20 ? live : list;
     updated = '${doc['updated'] ?? ''}';
     source = '${doc['source'] ?? ''}';
     return true;

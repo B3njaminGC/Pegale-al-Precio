@@ -46,14 +46,14 @@ Límites a tener en cuenta: el ranking confía en lo que manda el celular (las r
 
 ## Precios y fotos reales de Mercado Libre
 
-La API de Mercado Libre rechaza las consultas anónimas (error 403 desde GitHub), así que hace falta una aplicación de desarrollador gratis:
+La búsqueda abierta de Mercado Libre (`/sites/MLA/search`) está cerrada a apps de terceros: da error 403 aunque uses credenciales. Lo que sí funciona con una app de desarrollador gratis es el **catálogo de productos** (`/products/search` y `/products/{id}/items`), que trae el nombre, la foto y las ofertas con precio en pesos. Es lo que usa el script.
 
 1. Entrá a [developers.mercadolibre.com.ar](https://developers.mercadolibre.com.ar), **Mis aplicaciones**, **Crear aplicación**.
 2. Copiá el **App ID** y la **Clave secreta**.
-3. En GitHub: **Settings**, **Secrets and variables**, **Actions**, **New repository secret**: `ML_CLIENT_ID` (App ID) y `ML_CLIENT_SECRET` (clave secreta).
-4. En **Actions**, **Actualizar productos**, **Run workflow**. Al terminar, el resumen de la corrida muestra una tabla con el producto elegido de cada búsqueda. Si alguno está mal, ajustá `scripts/catalog.json` (`must`, `not`, `lo`, `hi`).
+3. En GitHub: **Settings**, **Secrets and variables**, **Actions**, **New repository secret**: `ML_CLIENT_ID` y `ML_CLIENT_SECRET`.
+4. En **Actions**, **Actualizar productos**, **Run workflow**. El resumen de la corrida muestra una tabla con el producto elegido de cada búsqueda y, abajo, por qué no se pudo actualizar cada uno de los que fallaron. Si alguno está mal, ajustá `scripts/catalog.json` (`q`, `must`, `not`, `lo`, `hi`).
 
-Desde ahí corre todos los días a la madrugada y guarda `data/products.json`. Si Mercado Libre falla un día, quedan los datos del día anterior. Hasta que esto funcione, la app usa precios estimados y sin fotos.
+Corre todos los días a la madrugada y guarda `data/products.json`. Si un producto no se encuentra, queda con el último dato bueno (o con el precio estimado y sin foto). Si hay al menos 20 productos con datos reales, la app juega solo con esos.
 
 ## Desarrollo
 
