@@ -2,8 +2,8 @@
 
 /// Salas online y ranking. Se completan con los datos de la consola de Firebase
 /// (ver README, sección "Salas online y ranking"). Si quedan vacíos, esas funciones se muestran apagadas.
-const String kFirebaseApiKey = '';
-const String kFirebaseDatabaseUrl = '';
+const String kFirebaseApiKey = 'AIzaSyB3ONfDb3MfTKBsV3IDkuWPBcb1vJr6lAM';
+const String kFirebaseDatabaseUrl = 'https://pegale-al-precio-default-rtdb.firebaseio.com';
 
 /// Productos y precios del día. Los actualiza el workflow "Actualizar productos".
 const String kProductsUrl =
