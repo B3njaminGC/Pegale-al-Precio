@@ -14,10 +14,11 @@ enum _Board { none, needName, sending, done, error }
 
 /// Resultado de una partida del desafío o rápida.
 class EndScreen extends StatefulWidget {
-  const EndScreen({super.key, required this.game, required this.mode, required this.practice});
+  const EndScreen({super.key, required this.game, required this.mode, required this.practice, this.dateKey});
   final Game game;
   final String mode;
   final bool practice;
+  final String? dateKey;
 
   @override
   State<EndScreen> createState() => _EndScreenState();
@@ -29,6 +30,7 @@ class _EndScreenState extends State<EndScreen> {
   _Board board = _Board.none;
   String boardText = '';
 
+  String get _key => widget.dateKey ?? arDateKey();
   bool get daily => widget.mode == 'daily';
   Game get g => widget.game;
 
@@ -46,7 +48,7 @@ class _EndScreenState extends State<EndScreen> {
     } else if (widget.practice) {
       note = 'Partida de práctica. En el ranking cuenta tu primera partida del día.';
     } else {
-      env.setJson('pap.daily.${arDateKey()}', {'score': g.total, 'base': g.base, 'grid': shareGrid(g.log)});
+      env.setJson('pap.daily.${_key}', {'score': g.total, 'base': g.base, 'grid': shareGrid(g.log)});
     }
     _initBoard();
   }
@@ -58,7 +60,7 @@ class _EndScreenState extends State<EndScreen> {
   }
 
   Map<String, dynamic>? _rec() {
-    final r = env.getJson('pap.daily.${arDateKey()}');
+    final r = env.getJson('pap.daily.${_key}');
     return r is Map ? Map<String, dynamic>.from(r) : null;
   }
 
@@ -85,7 +87,7 @@ class _EndScreenState extends State<EndScreen> {
   }
 
   Future<void> _submit() async {
-    final key = arDateKey();
+    final key = _key;
     final rec = _rec();
     if (rec == null || env.name.isEmpty) return;
     setState(() {
@@ -138,7 +140,7 @@ class _EndScreenState extends State<EndScreen> {
     env.setName(n).then((_) => _submit());
   }
 
-  String get _label => daily ? 'Desafío del ${prettyDate(arDateKey())}' : 'Partida rápida';
+  String get _label => daily ? 'Desafío del ${prettyDate(_key)}' : 'Partida rápida';
 
   void _share() {
     final text = 'Pegale al Precio · $_label\n${num0(g.total)} puntos · ${rankOf(g.base / g.items.length)}\n${shareGrid(g.log)}\n$kDownloadUrl';

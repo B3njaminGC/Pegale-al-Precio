@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../config.dart';
@@ -77,6 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final key = arDateKey();
     final rec = env.getJson('pap.daily.$key');
     final played = rec is Map && rec['score'] is num;
+    final prog = env.getJson('pap.dailyprog.$key');
+    final progRound = prog is Map && prog['round'] is num ? (prog['round'] as num).toInt() : 0;
+    final inProgress = !played && progRound > 0;
     final sheet = dailyItems(env.products, key, 5).take(3).toList();
 
     return Scaffold(
@@ -129,14 +134,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   ]),
                 ),
                 const SizedBox(height: 14),
-                Text(
-                  played
-                      ? 'Hoy hiciste ${num0(rec['score'] as num)} puntos. Podés volver a jugar de práctica.'
-                      : 'En el ranking cuenta tu primera partida del día.',
-                  style: mono(12, color: C.muted),
-                ),
+                if (played) ...[
+                  Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+                    Text('Hoy: ${num0(rec['score'] as num)} puntos', style: mono(13, w: FontWeight.w700, color: C.accent)),
+                    const SizedBox(width: 10),
+                    Text('${rec['grid'] ?? ''}', style: const TextStyle(fontSize: 14, letterSpacing: 1)),
+                  ]),
+                  const SizedBox(height: 6),
+                  Row(children: [
+                    Text('Próximo desafío en ', style: mono(12, color: C.muted)),
+                    _Countdown(onDone: () => setState(() {})),
+                  ]),
+                ] else
+                  Text(
+                    inProgress
+                        ? 'Ya empezaste el desafío de hoy: no se puede reiniciar.'
+                        : 'Una sola partida por día. Se renueva a las 00:00.',
+                    style: mono(12, color: C.muted),
+                  ),
                 const SizedBox(height: 16),
-                PrimaryButton('Jugar el desafío', onPressed: () => _go(PlayScreen.dailyRoute())),
+                PrimaryButton(
+                  played ? 'Desafío completado' : (inProgress ? 'Seguir el desafío · producto ${progRound + 1} de 5' : 'Jugar el desafío'),
+                  onPressed: played ? null : () => _go(PlayScreen.dailyRoute()),
+                ),
               ]),
             ),
             const SizedBox(height: 12),
@@ -275,5 +295,54 @@ class _Fan extends StatelessWidget {
         ]),
       ),
     );
+  }
+}
+
+/// Cuenta regresiva hasta las 00:00 de Argentina. Al llegar a cero avisa para mostrar el desafío nuevo.
+class _Countdown extends StatefulWidget {
+  const _Countdown({required this.onDone});
+  final VoidCallback onDone;
+  @override
+  State<_Countdown> createState() => _CountdownState();
+}
+
+class _CountdownState extends State<_Countdown> {
+  Timer? _t;
+  bool _fired = false;
+
+  Duration get _left {
+    final now = DateTime.now().toUtc();
+    final ar = now.subtract(const Duration(hours: 3));
+    final next = DateTime.utc(ar.year, ar.month, ar.day + 1, 3);
+    return next.difference(now);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _t = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      if (_left.inSeconds <= 0 && !_fired) {
+        _fired = true;
+        widget.onDone();
+        return;
+      }
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _t?.cancel();
+    super.dispose();
+  }
+
+  String _two(int v) => v.toString().padLeft(2, '0');
+
+  @override
+  Widget build(BuildContext context) {
+    final d = _left.isNegative ? Duration.zero : _left;
+    return Text('${_two(d.inHours)}:${_two(d.inMinutes % 60)}:${_two(d.inSeconds % 60)}',
+        style: mono(12, w: FontWeight.w700, color: C.ink));
   }
 }

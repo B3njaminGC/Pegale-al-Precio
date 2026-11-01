@@ -11,19 +11,24 @@ import '../widgets.dart';
 import 'end.dart';
 
 class PlayScreen extends StatefulWidget {
-  const PlayScreen({super.key, required this.mode, required this.items, this.practice = false, this.roomCode, this.saved});
+  const PlayScreen({super.key, required this.mode, required this.items, this.practice = false, this.roomCode, this.saved, this.dailyKey});
 
   final String mode; // daily, quick o room
   final List<Product> items;
   final bool practice;
   final String? roomCode;
   final dynamic saved;
+  final String? dailyKey;
 
   static Route<void> dailyRoute() {
     final key = arDateKey();
-    final practice = env.getJson('pap.daily.$key') != null;
     return MaterialPageRoute<void>(
-      builder: (_) => PlayScreen(mode: 'daily', items: dailyItems(env.products, key, 5), practice: practice),
+      builder: (_) => PlayScreen(
+        mode: 'daily',
+        items: dailyItems(env.products, key, 5),
+        dailyKey: key,
+        saved: env.getJson('pap.dailyprog.$key'), // si ya empezó, retoma donde quedó
+      ),
     );
   }
 
@@ -60,6 +65,9 @@ class _PlayScreenState extends State<PlayScreen> {
       if (!_focus.hasFocus) _syncText();
     });
     _syncText();
+    if (game.done && widget.mode == 'daily') {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _next()); // terminó pero no llegó a ver el resultado
+    }
   }
 
   @override
@@ -99,6 +107,9 @@ class _PlayScreenState extends State<PlayScreen> {
       HapticFeedback.heavyImpact();
     } else {
       HapticFeedback.mediumImpact();
+    }
+    if (widget.dailyKey != null) {
+      env.setJson('pap.dailyprog.${widget.dailyKey}', game.toJson());
     }
     if (widget.mode == 'room' && widget.roomCode != null) {
       env.setJson('pap.room.${widget.roomCode}', game.toJson());
@@ -146,7 +157,7 @@ class _PlayScreenState extends State<PlayScreen> {
       return;
     }
     Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
-      builder: (_) => EndScreen(game: game, mode: widget.mode, practice: widget.practice),
+      builder: (_) => EndScreen(game: game, mode: widget.mode, practice: widget.practice, dateKey: widget.dailyKey),
     ));
   }
 
@@ -166,6 +177,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (game.done && !revealed) return const Scaffold(body: SizedBox.shrink());
     final it = revealed ? shown! : game.current;
     final lot = revealed ? game.round : game.round + 1;
     return PopScope(
