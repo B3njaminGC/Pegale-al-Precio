@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../config.dart';
 import '../core.dart';
 import '../env.dart';
+import '../net.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import 'play.dart';
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       env.applyDownloaded();
     }
     if (mounted) setState(() {});
+    _sendRank();
   }
 
   String get _fine {
@@ -49,6 +51,82 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'Precios de publicaciones reales de Mercado Libre Argentina, actualizados el $d. Juego independiente, sin relación con Mercado Libre.';
     }
     return 'Precios de referencia estimados${d.isEmpty ? '' : ' al $d'}. Juego independiente, sin relación con Mercado Libre.';
+  }
+
+  bool _sending = false;
+
+  Future<String?> _askName() {
+    final ctl = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: C.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Tu apodo para el ranking', style: sans(18, w: FontWeight.w700)),
+        content: TextField(
+          controller: ctl,
+          autofocus: true,
+          maxLength: 14,
+          style: sans(16),
+          decoration: const InputDecoration(hintText: 'Apodo', counterText: ''),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Cancelar', style: sans(14, color: C.muted))),
+          TextButton(
+            onPressed: () {
+              final n = sanitizeName(ctl.text);
+              if (n.isNotEmpty) Navigator.of(ctx).pop(n);
+            },
+            child: Text('Entrar', style: sans(14, w: FontWeight.w700, color: C.accent)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Sube al ranking el resultado de hoy si todavía no se mandó (por ejemplo, si se jugó antes de activar el ranking).
+  Future<void> _sendRank({bool ask = false}) async {
+    final key = arDateKey();
+    final rec = env.getJson('pap.daily.$key');
+    if (rec is! Map || rec['submitted'] == true || !env.net.enabled || _sending) return;
+    if (env.name.isEmpty) {
+      if (!ask) return;
+      final n = await _askName();
+      if (n == null) return;
+      await env.setName(n);
+    }
+    if (!mounted) return;
+    setState(() => _sending = true);
+    String msg = 'Tu resultado entró al ranking';
+    try {
+      final r = Map<String, dynamic>.from(rec);
+      final score = (r['score'] as num).toInt();
+      final status = await env.net.submitDaily(key, env.name, score);
+      if (status == 'ok') {
+        try {
+          await env.net.submitWeekly(weekStartKey(key), key, env.name, score);
+        } catch (_) {}
+      } else {
+        msg = 'Ya tenías un resultado de hoy en el ranking';
+      }
+      final t = await env.net.top('daily', key, 50);
+      var idx = -1;
+      for (var i = 0; i < t.rows.length; i++) {
+        if (t.rows[i].uid == t.me) idx = i;
+      }
+      r['submitted'] = true;
+      r['status'] = status;
+      r['rank'] = idx >= 0 ? idx + 1 : null;
+      r['of'] = t.rows.length;
+      await env.setJson('pap.daily.$key', r);
+    } on NetError {
+      msg = 'No se pudo enviar. Revisá tu conexión y probá de nuevo';
+    } catch (_) {
+      msg = 'No se pudo enviar. Probá de nuevo';
+    }
+    if (!mounted) return;
+    setState(() => _sending = false);
+    toast(context, msg);
   }
 
   Future<void> _go(Route<void> route) async {
@@ -145,6 +223,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text('Próximo desafío en ', style: mono(12, color: C.muted)),
                     _Countdown(onDone: () => setState(() {})),
                   ]),
+                  if (env.net.enabled && rec['submitted'] != true) ...[
+                    const SizedBox(height: 12),
+                    Text('Tu resultado todavía no está en el ranking de hoy.', style: sans(13, color: C.gold)),
+                    const SizedBox(height: 8),
+                    SecondaryButton(_sending ? 'Enviando…' : 'Subir mi resultado al ranking',
+                        height: 44, onPressed: _sending ? null : () => _sendRank(ask: true)),
+                  ] else if (rec['rank'] is num) ...[
+                    const SizedBox(height: 6),
+                    Text('Ranking de hoy: puesto ${(rec['rank'] as num).toInt()} de ${(rec['of'] as num?)?.toInt() ?? '?'}',
+                        style: sans(13, color: C.muted)),
+                  ],
                 ] else
                   Text(
                     inProgress
