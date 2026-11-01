@@ -138,13 +138,31 @@ class Plate extends StatelessWidget {
   final double pad;
   final bool small;
 
+  static const Map<String, IconData> _icons = {
+    'Computación': Icons.laptop_mac_rounded,
+    'Celulares': Icons.smartphone_rounded,
+    'Cocina': Icons.blender_rounded,
+    'Audio': Icons.headphones_rounded,
+    'Hogar': Icons.chair_rounded,
+    'Electrodomésticos': Icons.kitchen_rounded,
+    'Indumentaria': Icons.checkroom_rounded,
+    'Consolas': Icons.sports_esports_rounded,
+    'Relojes': Icons.watch_rounded,
+    'Cámaras': Icons.photo_camera_rounded,
+    'Accesorios': Icons.devices_other_rounded,
+    'Deportes': Icons.fitness_center_rounded,
+    'Camping': Icons.terrain_rounded,
+    'Música': Icons.music_note_rounded,
+    'Tablets': Icons.tablet_mac_rounded,
+    'Lectura': Icons.menu_book_rounded,
+    'Componentes': Icons.memory_rounded,
+    'Televisores': Icons.tv_rounded,
+    'Mate': Icons.coffee_rounded,
+  };
+
+  /// Sin foto: un ícono de la categoría, sin texto, para que la placa no quede vacía ni desprolija.
   Widget _placeholder() => Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(product.c.isEmpty ? 'Producto' : product.c,
-              style: sans(small ? 11 : 17, w: FontWeight.w700, color: C.plateInk), textAlign: TextAlign.center),
-          if (!small) const SizedBox(height: 2),
-          if (!small) Text('Foto no disponible', style: sans(12, color: const Color(0xFF5B677F))),
-        ]),
+        child: Icon(_icons[product.c] ?? Icons.sell_rounded, size: small ? 30 : 76, color: const Color(0xFF9AA8C2)),
       );
 
   @override
@@ -169,7 +187,14 @@ class Plate extends StatelessWidget {
     return AspectRatio(
       aspectRatio: aspect,
       child: Container(
-        decoration: BoxDecoration(color: C.plate, borderRadius: BorderRadius.circular(radius)),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(radius),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFF4F6FA), Color(0xFFE2E7EF)],
+          ),
+        ),
         clipBehavior: Clip.antiAlias,
         child: child,
       ),

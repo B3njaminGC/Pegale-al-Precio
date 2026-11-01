@@ -132,7 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ]),
             ),
             const SizedBox(height: 12),
-            Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            IntrinsicHeight(
+              child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Expanded(
                 child: _Tile(
                   title: 'Partida rápida',
@@ -149,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ]),
+            ),
             const SizedBox(height: 22),
             const _How('01', 'Mirá el producto.', 'Foto y ficha técnica, sin el precio.'),
             const _How('02', 'Fijá tu precio.', 'Cuanto más cerca, más puntos. Las rachas multiplican.'),
