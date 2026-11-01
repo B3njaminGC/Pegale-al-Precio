@@ -1,4 +1,5 @@
-// Servidor que imita las partes de la API de Mercado Libre que usa scripts/fetch-products.mjs.
+// Servidor que imita las partes de la API de Mercado Libre que usa scripts/fetch-products.mjs:
+// búsqueda en el catálogo de productos, ofertas de cada producto y la página de un ítem.
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,47 +10,47 @@ const catalog = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts/catalog.json
 
 /**
  * opciones:
- *   requireAuth   exige Authorization: Bearer test-token en search e items
+ *   requireAuth   exige Authorization: Bearer test-token
  *   denyAll       responde 403 a todo
  *   onlyNoise     lista de ids de catálogo cuya búsqueda devuelve solo accesorios y usados
  *   flaky         lista de ids cuya primera búsqueda responde 429
- *   noItemPage    /items/:id responde 404 (para probar el plan B de la miniatura)
+ *   noPictures    los productos no traen foto (ni en la búsqueda ni en su ficha)
  */
 export function startMock(opts = {}) {
-  const calls = { search: [], items: [], token: 0, rejected: 0 };
+  const calls = { search: [], offers: [], items: [], token: 0, rejected: 0 };
   const flakySeen = new Set();
   const byQuery = new Map(catalog.items.map(e => [e.q, e]));
+  const byId = new Map(catalog.items.map(e => [e.id, e]));
   let seq = 1000;
 
-  const listing = (entry, price, title, extra = {}) => {
-    const id = `MLA${seq++}`;
-    return {
-      id, title, price, currency_id: 'ARS', condition: 'new',
-      permalink: `https://articulo.mercadolibre.com.ar/MLA-${id.slice(3)}-${entry.id}-_JM`,
-      thumbnail: `http://http2.mlstatic.com/D_${id}-I.jpg`,
-      secure_thumbnail: `https://http2.mlstatic.com/D_${id}-I.jpg`,
-      ...extra,
-    };
-  };
+  const picture = pid => (opts.noPictures ? [] : [{ url: `http://http2.mlstatic.com/D_NQ_NP_${pid}-F.jpg` }]);
 
-  const resultsFor = entry => {
+  const productsFor = entry => {
     const base = entry.must.join(' ');
-    const mid = (entry.lo + entry.hi) / 2;
     const out = [];
     if (!(opts.onlyNoise || []).includes(entry.id)) {
-      // 7 publicaciones válidas con precios crecientes: la mediana es la cuarta
-      for (let i = 0; i < 7; i++) {
-        const tag = ['alfa', 'beta', 'gama', 'delta', 'epsilon', 'zeta', 'eta'][i]; // palabras: un número podría chocar con los términos prohibidos
-        out.push(listing(entry, Math.round(entry.est * (0.8 + i * 0.07)), `${base} nuevo original garantia ${tag}`));
-      }
+      out.push({ id: `MLAV-${entry.id}`, name: `${base} nuevo original garantia`, pictures: picture(`V${entry.id}`) });
     }
-    // ruido que tiene que descartarse
-    out.push(listing(entry, Math.round(entry.lo / 10), `funda para ${base}`));
-    out.push(listing(entry, entry.est, `${base} usado impecable`));
-    out.push(listing(entry, entry.est, `${base} reacondicionado`));
-    out.push(listing(entry, Math.round(entry.hi * 3), `${base} combo mayorista`));
-    out.push(listing(entry, 500, `${base} nuevo`, { currency_id: 'USD' }));
-    out.push(listing(entry, Math.round(mid), `otra cosa distinta sin relacion`));
+    // ruido que tiene que descartarse por el nombre
+    out.push({ id: `MLAN-${entry.id}-1`, name: `funda para ${base}`, pictures: picture('N1') });
+    out.push({ id: `MLAN-${entry.id}-2`, name: `${base} usado impecable`, pictures: picture('N2') });
+    out.push({ id: `MLAN-${entry.id}-3`, name: `${base} reacondicionado`, pictures: picture('N3') });
+    out.push({ id: `MLAN-${entry.id}-4`, name: 'otra cosa distinta sin relacion', pictures: picture('N4') });
+    return out;
+  };
+
+  const offersFor = entry => {
+    const offer = (price, extra = {}) => ({
+      item_id: `MLA${seq++}`, site_id: 'MLA', price, currency_id: 'ARS', condition: 'new', ...extra,
+    });
+    const out = [];
+    // 7 ofertas válidas con precios crecientes: la mediana es la cuarta
+    for (let i = 0; i < 7; i++) out.push(offer(Math.round(entry.est * (0.8 + i * 0.07))));
+    // ofertas que tienen que descartarse por precio, moneda o estado
+    out.push(offer(Math.round(entry.lo / 10)));
+    out.push(offer(Math.round(entry.hi * 3)));
+    out.push(offer(500, { currency_id: 'USD' }));
+    out.push(offer(entry.est, { condition: 'used' }));
     return out;
   };
 
@@ -73,24 +74,35 @@ export function startMock(opts = {}) {
 
     if (opts.denyAll || (opts.requireAuth && !authed)) { calls.rejected++; return send(403, { message: 'forbidden', error: 'forbidden', status: 403 }); }
 
-    if (u.pathname === '/sites/MLA/search') {
+    // la búsqueda abierta de Mercado Libre está cerrada a apps de terceros
+    if (u.pathname === '/sites/MLA/search') return send(403, { message: 'forbidden', error: 'forbidden', status: 403 });
+
+    if (u.pathname === '/products/search') {
       const q = u.searchParams.get('q');
-      calls.search.push({ q, limit: u.searchParams.get('limit'), condition: u.searchParams.get('condition') });
+      calls.search.push({ q, limit: u.searchParams.get('limit'), site: u.searchParams.get('site_id') });
       const entry = byQuery.get(q);
       if (!entry) return send(200, { results: [] });
       if ((opts.flaky || []).includes(entry.id) && !flakySeen.has(entry.id)) { flakySeen.add(entry.id); return send(429, { message: 'too many requests' }); }
-      return send(200, { results: resultsFor(entry) });
+      return send(200, { paging: { total: 5 }, results: productsFor(entry) });
     }
 
-    const m = u.pathname.match(/^\/items\/(MLA\d+)$/);
+    let m = u.pathname.match(/^\/products\/(MLA[VN]-[^/]+)\/items$/);
+    if (m) {
+      calls.offers.push(m[1]);
+      if (!m[1].startsWith('MLAV-')) return send(404, { message: 'No winners found', error: 'not_found', status: 404 });
+      return send(200, { paging: { total: 11 }, results: offersFor(byId.get(m[1].slice(5))) });
+    }
+
+    m = u.pathname.match(/^\/products\/(MLA[VN]-[^/]+)$/);
+    if (m) {
+      if (opts.noPictures) return send(200, { id: m[1], pictures: [] });
+      return send(200, { id: m[1], pictures: picture(m[1]) });
+    }
+
+    m = u.pathname.match(/^\/items\/(MLA\d+)$/);
     if (m) {
       calls.items.push(m[1]);
-      if (opts.noItemPage) return send(404, { message: 'not found' });
-      return send(200, {
-        id: m[1], title: `detalle ${m[1]}`,
-        permalink: `https://articulo.mercadolibre.com.ar/MLA-${m[1].slice(3)}-detalle-_JM`,
-        pictures: [{ secure_url: `https://http2.mlstatic.com/D_NQ_NP_${m[1]}-F.webp` }],
-      });
+      return send(200, { id: m[1], permalink: `https://articulo.mercadolibre.com.ar/MLA-${m[1].slice(3)}-detalle-_JM` });
     }
     send(404, { message: 'no existe' });
   });

@@ -129,35 +129,60 @@ function write(items) {
 }
 
 /* ---------- búsqueda de un producto ---------- */
+// La búsqueda abierta (/sites/MLA/search) está cerrada a apps de terceros. Se usa el catálogo de productos:
+// /products/search encuentra los productos, /products/{id}/items trae las ofertas con su precio en pesos.
+const pictureOf = p => {
+  const pic = (p && p.pictures || [])[0];
+  return https(pic && (pic.secure_url || pic.url)) || null;
+};
+
 async function resolve(entry) {
-  const qs = new URLSearchParams({ q: entry.q, limit: '50', condition: 'new' });
-  const search = await getJson(`/sites/${SITE}/search?${qs}`);
+  const qs = new URLSearchParams({ status: 'active', site_id: SITE, q: entry.q, limit: '20' });
+  const search = await getJson(`/products/search?${qs}`);
   const results = search.results || [];
-  const candidates = results.filter(r => passes(entry, r));
-  if (candidates.length < MIN_CANDIDATES) {
-    throw new Error(`solo ${candidates.length} publicaciones sirven de ${results.length} encontradas`);
+  // el nombre del producto tiene que tener las palabras pedidas y ninguna prohibida
+  const prods = results.filter(r => passes(entry, { title: r.name || '', price: entry.est, currency_id: 'ARS' })).slice(0, 3);
+
+  const offers = [];
+  for (const p of prods) {
+    await sleep(DELAY);
+    let list;
+    try {
+      list = (await getJson(`/products/${p.id}/items?limit=50`)).results || [];
+    } catch (e) {
+      if (e instanceof ApiError && (e.status === 404 || e.status === 400)) continue; // producto sin ofertas
+      throw e;
+    }
+    for (const o of list) {
+      if (o.condition && o.condition !== 'new') continue;
+      if (!passes(entry, { title: p.name, price: o.price, currency_id: o.currency_id })) continue;
+      offers.push({ ...o, product: p });
+    }
   }
-  const chosen = pickMedian(candidates);
-  let img = null, link = chosen.permalink, title = chosen.title;
+  if (offers.length < MIN_CANDIDATES) {
+    throw new Error(`solo ${offers.length} publicaciones sirven de ${results.length} productos encontrados`);
+  }
+  const chosen = pickMedian(offers);
+
+  let img = pictureOf(chosen.product);
+  if (!img) {
+    try { await sleep(DELAY); img = pictureOf(await getJson(`/products/${chosen.product.id}`)); } catch { /* sin foto */ }
+  }
+  let link = `https://articulo.mercadolibre.com.ar/MLA-${String(chosen.item_id).replace(/\D/g, '')}`;
   try {
     await sleep(DELAY);
-    const d = await getJson(`/items/${chosen.id}?attributes=id,title,permalink,pictures,thumbnail,secure_thumbnail`);
-    const pic = (d.pictures || [])[0];
-    img = https(pic?.secure_url || pic?.url || d.secure_thumbnail || d.thumbnail);
-    link = d.permalink || link;
-    title = d.title || title;
-  } catch {
-    img = https(chosen.secure_thumbnail || chosen.thumbnail);
-    if (img) img = img.replace(/-I\.(jpg|webp)$/, '-O.$1');
-  }
+    const d = await getJson(`/items/${chosen.item_id}?attributes=id,permalink`);
+    if (d.permalink) link = d.permalink;
+  } catch { /* queda el link armado con el número de la publicación */ }
+
   return {
     item: {
       id: entry.id, n: entry.n, c: entry.c, s: entry.s,
       p: Math.round(chosen.price), link: https(link), img: img || undefined,
-      ml: { id: chosen.id, title }, src: 'ml', t: new Date().toISOString(),
+      ml: { id: chosen.item_id, title: chosen.product.name }, src: 'ml', t: new Date().toISOString(),
     },
     found: results.length,
-    used: candidates.length,
+    used: offers.length,
   };
 }
 
@@ -205,7 +230,7 @@ async function main() {
   const summary = [
     `## Productos actualizados: ${fresh} de ${catalog.items.length}`,
     '',
-    '| Producto | Precio | Foto | Sirvieron | Publicación elegida |',
+    '| Producto | Precio | Foto | Ofertas válidas / productos | Publicación elegida |',
     '|---|---|---|---|---|',
     ...rows,
     '',

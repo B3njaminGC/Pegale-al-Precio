@@ -66,7 +66,7 @@ test('actualiza los 45 productos con precio mediano, foto y link', async () => {
   const doc = JSON.parse(fs.readFileSync(out, 'utf8'));
   assert.equal(doc.items.length, 45);
   assert.ok(doc.items.every(i => i.src === 'ml'));
-  assert.ok(doc.items.every(i => i.img && i.img.startsWith('https://')), 'todas con foto https');
+  assert.ok(doc.items.every(i => i.img && i.img.startsWith('https://http2.mlstatic.com/')), 'todas con foto https de mlstatic');
   assert.ok(doc.items.every(i => i.link.includes('mercadolibre.com.ar')));
   assert.ok(doc.items.every(i => i.ml.id.startsWith('MLA')));
   for (const e of catalog.items) {
@@ -75,7 +75,7 @@ test('actualiza los 45 productos con precio mediano, foto y link', async () => {
     assert.deepEqual(it.s, e.s);
   }
   assert.equal(mock.calls.search.length, 45);
-  assert.ok(mock.calls.search.every(c => c.limit === '50' && c.condition === 'new'));
+  assert.ok(mock.calls.search.every(c => c.limit === '20' && c.site === 'MLA'));
 });
 
 test('si un producto falla conserva el dato anterior y sigue con el resto', async () => {
@@ -145,14 +145,14 @@ test('con credenciales pide el token y lo usa', async () => {
   assert.equal(JSON.parse(fs.readFileSync(out, 'utf8')).items.length, 45);
 });
 
-test('si falla la página del ítem usa la miniatura en tamaño grande', async () => {
+test('si el producto no trae foto lo actualiza igual, sin foto', async () => {
   const out = tmp();
-  const m = await startMock({ noItemPage: true });
+  const m = await startMock({ noPictures: true });
   const r = await run([], { ML_API_BASE: m.url, PRODUCTS_OUT: out });
   await m.close();
   assert.equal(r.status, 0, r.stderr);
-  const it = JSON.parse(fs.readFileSync(out, 'utf8')).items[0];
-  assert.match(it.img, /^https:\/\/http2\.mlstatic\.com\/D_MLA\d+-O\.jpg$/);
+  const doc = JSON.parse(fs.readFileSync(out, 'utf8'));
+  assert.ok(doc.items.every(i => i.src === 'ml' && i.img === undefined));
 });
 
 test('--seed arma el archivo base sin red', async () => {
