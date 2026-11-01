@@ -1,59 +1,73 @@
 # Pegale al Precio
 
-Juego para adivinar cuánto sale un producto en pesos a partir de su ficha técnica. Tiene partida rápida, desafío del día y versus de dos jugadores en un solo celular. Cada producto trae un botón que abre la búsqueda en Mercado Libre Argentina. Este juego no tiene relación con Mercado Libre.
+Juego para celular (Android) en el que adivinás el precio en pesos de productos reales que se venden en Mercado Libre Argentina. Ves la foto y la ficha, fijás tu precio y se revela el real, con el link a la publicación.
 
-El mismo código sirve para tres cosas: la web (GitHub Pages o itch.io), la app instalable desde el navegador (PWA) y el APK de Android.
+- **Desafío del día**: 5 productos iguales para todo el país. En el ranking cuenta la primera partida de cada día.
+- **Partida rápida**: 8 productos al azar.
+- **Salas online**: creás una sala, mandás el código y cada uno juega a su hora. La tabla se arma sola a medida que terminan.
+- **Ranking Argentina**: del día y de la semana.
 
-## Qué hay en cada carpeta
+Juego independiente, sin relación con Mercado Libre. App hecha con Flutter, solo para celular.
 
-- `docs/`: el juego. `index.html` es un solo archivo con todo el código, más el manifest, el service worker y los íconos.
-- `assets/`: los íconos originales que usa el APK.
-- `.github/workflows/build-apk.yml`: el paso a paso que GitHub ejecuta para compilar el APK.
-- `package.json` y `capacitor.config.json`: configuración de Capacitor, que empaqueta la web como app Android.
+## Cómo está armado
 
-## Generar el APK sin Android Studio
+| Carpeta | Qué tiene |
+|---|---|
+| `lib/` | La app (Flutter): pantallas, puntaje, conexión online |
+| `test/` | Pruebas de la lógica (puntaje, desafío del día, fechas) |
+| `data/products.json` | Productos y precios del día. Va dentro de la app y además la app lo baja actualizado |
+| `scripts/` | `catalog.json` (qué productos se buscan) y `fetch-products.mjs` (trae precios y fotos de Mercado Libre) |
+| `database.rules.json` | Reglas de seguridad de Firebase |
+| `.github/workflows/` | `build-apk.yml` compila el APK; `update-products.yml` actualiza los precios cada día |
+| `ci/debug.keystore` | Firma con la que se compila el APK (la misma siempre, así se puede actualizar sin desinstalar) |
 
-1. Creá un repositorio en GitHub y subí todo el contenido de esta carpeta, incluida la carpeta oculta `.github`.
-   Si al arrastrar archivos en la web no sube `.github`, usá **Add file → Create new file**, escribí el nombre `.github/workflows/build-apk.yml` y pegá el contenido del archivo.
-2. Andá a la pestaña **Actions**, elegí **Compilar APK** y tocá **Run workflow**. Tarda entre 5 y 10 minutos.
-3. Cuando termine, abrí esa corrida y bajá **pegale-al-precio-apk** desde la sección **Artifacts**. Es un zip con el archivo `pegale-al-precio.apk`.
-4. Para tener un link de descarga público, creá un release con un tag que empiece con `v`, por ejemplo `v1.0.0` (**Releases → Draft a new release**). El workflow corre solo y adjunta el APK al release.
-5. Para instalarlo, pasá el APK al celular y permití instalar apps de orígenes desconocidos cuando Android lo pida.
+## Bajar el APK
 
-Es un APK de prueba (debug), bueno para compartir en foros o con amigos. Para subirlo a Google Play hace falta una versión release firmada con tu propia clave.
+1. En GitHub, pestaña **Actions**, **Compilar APK**, la última corrida verde: abajo, en **Artifacts**, está `pegale-al-precio-apk`.
+2. Para tenerlo siempre en **Releases**: creá un release nuevo con un tag que empiece con `v` (por ejemplo `v2.0.0`). El workflow compila y adjunta `pegale-al-precio.apk` solo.
+3. En el celu: abrí el APK y permití "instalar apps de esta fuente".
 
-El APK usa el nombre de paquete `com.pegalealprecio.juego`. Cambialo en `capacitor.config.json` antes de publicar en cualquier tienda.
+Si ya tenías instalada la versión anterior (la de Capacitor), son apps distintas: podés desinstalarla.
 
-## Instalarlo desde el navegador (PWA)
+## Salas online y ranking (Firebase)
 
-1. En el repositorio, andá a **Settings → Pages**, elegí **Deploy from a branch**, la rama `main` y la carpeta `/docs`.
-2. Abrí `https://TU-USUARIO.github.io/NOMBRE-DEL-REPO/` en Chrome del celular.
-3. Tocá el menú y elegí **Instalar app** o **Agregar a la pantalla principal**.
+Hace falta un proyecto de Firebase gratis. Una sola vez:
 
-## Subirlo a itch.io
+1. Entrá a [console.firebase.google.com](https://console.firebase.google.com) y creá un proyecto (sin Google Analytics).
+2. **Authentication**, **Sign-in method**, activá **Anónimo**.
+3. **Realtime Database**, **Crear base de datos** (elegí una región y modo bloqueado).
+4. En la pestaña **Reglas**, pegá todo el contenido de `database.rules.json` y publicá.
+5. **Configuración del proyecto** (la ruedita), **General**, **Tus apps**, agregá una app web (`</>`). Copiá `apiKey`. La `databaseURL` está en Realtime Database, arriba de los datos (algo como `https://tu-proyecto-default-rtdb.firebaseio.com`).
+6. Pegá esas dos cosas en `lib/config.dart` (`kFirebaseApiKey` y `kFirebaseDatabaseUrl`). Al guardar, GitHub compila un APK nuevo solo.
 
-1. En itch.io, andá a **Dashboard → Create new project** y en **Kind of project** elegí **HTML**.
-2. Subí `pegale-al-precio-itch.zip` y marcá **This file will be played in the browser**.
-3. En **Embed options** activá **Mobile friendly** y elegí orientación **Portrait**.
+Mientras esos datos estén vacíos, las salas y el ranking aparecen apagados y el resto del juego funciona igual.
 
-## Cambiar o agregar productos
+Límites a tener en cuenta: el ranking confía en lo que manda el celular (las reglas limitan el puntaje máximo, una sola partida por día y que cada uno escriba solo lo suyo, pero un jugador con conocimientos podría falsear su puntaje). Las salas no se borran solas.
 
-Está todo en el arreglo `PRODUCTS` al principio del `<script>` de `docs/index.html`:
+## Precios y fotos reales de Mercado Libre
 
-```js
-{n:'Nombre', e:'📱', c:'Categoría', s:['Dato 1','Dato 2','Dato 3'], p:280000, q:'texto-de-busqueda-en-ml'}
+La API de Mercado Libre rechaza las consultas anónimas (error 403 desde GitHub), así que hace falta una aplicación de desarrollador gratis:
+
+1. Entrá a [developers.mercadolibre.com.ar](https://developers.mercadolibre.com.ar), **Mis aplicaciones**, **Crear aplicación**.
+2. Copiá el **App ID** y la **Clave secreta**.
+3. En GitHub: **Settings**, **Secrets and variables**, **Actions**, **New repository secret**: `ML_CLIENT_ID` (App ID) y `ML_CLIENT_SECRET` (clave secreta).
+4. En **Actions**, **Actualizar productos**, **Run workflow**. Al terminar, el resumen de la corrida muestra una tabla con el producto elegido de cada búsqueda. Si alguno está mal, ajustá `scripts/catalog.json` (`must`, `not`, `lo`, `hi`).
+
+Desde ahí corre todos los días a la madrugada y guarda `data/products.json`. Si Mercado Libre falla un día, quedan los datos del día anterior. Hasta que esto funcione, la app usa precios estimados y sin fotos.
+
+## Desarrollo
+
+Se necesita Flutter. El APK se puede compilar sin instalar nada, con GitHub Actions. Para probar en la compu:
+
+```bash
+flutter create --platforms=android --org com.pegalealprecio --project-name pegale_al_precio .
+flutter pub get
+flutter test
+flutter run
 ```
 
-- `p` es el precio de referencia en pesos, entre 10.000 y 3.000.000.
-- `q` es la búsqueda que abre el botón: `https://listado.mercadolibre.com.ar/` seguido de `q`. Usá minúsculas, sin tildes y con guiones.
-- Cada producto necesita exactamente 3 datos en `s`.
-- Los precios actuales son estimaciones para octubre 2026, con el dólar a unos $1.560. Conviene revisarlos de vez en cuando.
+Los scripts de precios se prueban con `node --test tests/*.test.mjs` (usan un Mercado Libre simulado, no necesitan internet).
 
-Si cambiás el juego y ya lo tenías instalado como PWA, subí el número de `CACHE` en `docs/sw.js` para que los celulares bajen la versión nueva.
+## Puntaje
 
-## Detalles del APK
-
-- Queda fijo en vertical.
-- El botón Atrás de Android vuelve al inicio, y desde el inicio cierra la app.
-- Los links a Mercado Libre se abren fuera del juego, en el navegador o en la app de Mercado Libre si la tenés instalada.
-- Las tipografías se bajan de Google Fonts. Sin internet el juego funciona igual, pero con las del sistema.
+Base = `1000 · e^(−2,2 · |ln(tu precio / precio real)|)`. Si el error es de hasta 3% hay +200. Las rachas (puntaje base de 700 o más) multiplican hasta ×1,5. El máximo por producto es 1.800.
