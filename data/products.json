@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-01T22:58:59.673Z",
+  "updated": "2026-11-02T10:54:47.273Z",
   "site": "MLA",
   "source": "api.mercadolibre.com",
   "items": [
@@ -13,15 +13,15 @@
         "Pantalla OLED de 6,3\" a 120 Hz",
         "Cámara frontal de 18 MP"
       ],
-      "p": 2206230,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-1611423667",
+      "p": 2250000,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-3115572314",
       "img": "https://http2.mlstatic.com/D_NQ_NP_951124-MLA92147446613_092025-F.jpg",
       "ml": {
-        "id": "MLA1611423667",
+        "id": "MLA3115572314",
         "title": "Apple iPhone 17 (256 GB) - Lavanda"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:26.334Z"
+      "t": "2026-11-02T10:52:38.707Z"
     },
     {
       "id": "galaxy-s25",
@@ -32,15 +32,15 @@
         "Cámara principal de 50 MP",
         "256 GB de almacenamiento"
       ],
-      "p": 1530000,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2168523183",
+      "p": 1589000,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-1477984373",
       "img": "https://http2.mlstatic.com/D_NQ_NP_763998-MLA117314907793_092026-F.jpg",
       "ml": {
-        "id": "MLA2168523183",
+        "id": "MLA1477984373",
         "title": "Celular Samsung Galaxy S25 256 Gb 12 Ram Navy"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:28.665Z"
+      "t": "2026-11-02T10:52:40.847Z"
     },
     {
       "id": "moto-g",
@@ -51,15 +51,15 @@
         "128 GB y 4 GB de RAM",
         "Batería de 5.000 mAh"
       ],
-      "p": 359576,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2246281297",
+      "p": 358899,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-4123473356",
       "img": "https://http2.mlstatic.com/D_NQ_NP_776491-MLA99974410931_112025-F.jpg",
       "ml": {
-        "id": "MLA2246281297",
+        "id": "MLA4123473356",
         "title": "Motorola Moto G15 4 + 128 Gb"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:31.125Z"
+      "t": "2026-11-02T10:52:43.124Z"
     },
     {
       "id": "redmi-note",
@@ -70,15 +70,15 @@
         "Cámara principal de 108 MP",
         "Carga rápida de 33 W"
       ],
-      "p": 710000,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2249214215",
-      "img": "https://http2.mlstatic.com/D_NQ_NP_620544-MLA108009160235_032026-F.jpg",
+      "p": 713000,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-4123372852",
+      "img": "https://http2.mlstatic.com/D_NQ_NP_962677-MLA99501289816_112025-F.jpg",
       "ml": {
-        "id": "MLA2249214215",
-        "title": "Xiaomi REDMI Note 15 Pro 5G 256 GB Gris Titanio"
+        "id": "MLA4123372852",
+        "title": "Xiaomi Redmi note Redmi Note 14s Dual SIM 256 GB lila 8 GB RAM"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:33.753Z"
+      "t": "2026-11-02T10:52:45.476Z"
     },
     {
       "id": "ps5-slim",
@@ -89,15 +89,15 @@
         "Salida 4K hasta 120 Hz",
         "Incluye un joystick DualSense"
       ],
-      "p": 1427110,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2084259886",
-      "img": "https://http2.mlstatic.com/D_NQ_NP_992934-MLA99968145717_112025-F.jpg",
+      "p": 1200000,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-2230334412",
+      "img": "https://http2.mlstatic.com/D_NQ_NP_610358-MLA99510807270_112025-F.jpg",
       "ml": {
-        "id": "MLA2084259886",
-        "title": "Consola Sony PlayStation 5 Slim Standard 1TB"
+        "id": "MLA2230334412",
+        "title": "Consola Ps5 Slim Playstation 5 Dvd 1tb 4k Internacional"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:36.205Z"
+      "t": "2026-11-02T10:52:47.678Z"
     },
     {
       "id": "switch-2",
@@ -108,15 +108,15 @@
         "256 GB de almacenamiento",
         "Joy-Con magnéticos"
       ],
-      "p": 1499999,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-4129646130",
+      "p": 1450999,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-3518830146",
       "img": "https://http2.mlstatic.com/D_NQ_NP_935475-MLA85089057919_052025-F.jpg",
       "ml": {
-        "id": "MLA4129646130",
+        "id": "MLA3518830146",
         "title": "Consola Nintendo Switch 2"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:39.491Z"
+      "t": "2026-11-02T10:52:50.086Z"
     },
     {
       "id": "airpods-pro-2",
@@ -135,7 +135,7 @@
         "title": "Auriculares Inalámbricos Apple AirPods Pro 2ª Gen Blanco Cancelación Ruido"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:42.036Z"
+      "t": "2026-11-02T10:52:52.253Z"
     },
     {
       "id": "sony-xm5",
@@ -166,7 +166,7 @@
         "title": "Parlante Jbl Flip 6 Rojo"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:50.999Z"
+      "t": "2026-11-02T10:53:00.105Z"
     },
     {
       "id": "macbook-air-m4",
@@ -185,7 +185,7 @@
         "title": "Notebook Macbook MacBook Air MacBook Air M4 MW0W3BZ/A Silver 2025 13.6\" 2560 px x 1664 px disco SSD 256 GB Apple M4 16GB de Ram"
       },
       "src": "ml",
-      "t": "2026-11-01T22:56:56.620Z"
+      "t": "2026-11-02T10:53:05.045Z"
     },
     {
       "id": "notebook-i5",
@@ -216,7 +216,7 @@
         "title": "iPad iPad 11 (A16) 11\" 128GB rosa 6GB de memoria RAM"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:04.079Z"
+      "t": "2026-11-02T10:53:11.201Z"
     },
     {
       "id": "kindle-paperwhite",
@@ -259,7 +259,7 @@
         "title": "Reloj Casio F-91w-1d Negro Hombre"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:12.036Z"
+      "t": "2026-11-02T10:53:17.955Z"
     },
     {
       "id": "gopro-hero13",
@@ -278,7 +278,7 @@
         "title": "Cámara de Acción GoPro HERO 13 Black 5.3K Color Negro"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:14.262Z"
+      "t": "2026-11-02T10:53:19.899Z"
     },
     {
       "id": "dji-mini-4-pro",
@@ -301,15 +301,15 @@
         "165 Hz y 1 ms",
         "Compatible con FreeSync"
       ],
-      "p": 518960,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2141560666",
-      "img": "https://http2.mlstatic.com/D_NQ_NP_771956-MLA75567343436_042024-F.jpg",
+      "p": 503999,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-4148687876",
+      "img": "https://http2.mlstatic.com/D_NQ_NP_988100-MLA81819897998_012025-F.jpg",
       "ml": {
-        "id": "MLA2141560666",
-        "title": "Monitor Gamer Curvo Gigabyte 27 GS27QC Qhd 165hz Negro"
+        "id": "MLA4148687876",
+        "title": "Samsung Monitor Gamer Curvo 27 1ms 165hz Freesync"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:23.212Z"
+      "t": "2026-11-02T10:53:25.280Z"
     },
     {
       "id": "teclado-mecanico-75",
@@ -328,7 +328,7 @@
         "title": "Teclado Mecánico Aula F75 75% Inalámbrico Bluetooth 2.5ghz Negro"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:26.792Z"
+      "t": "2026-11-02T10:53:28.246Z"
     },
     {
       "id": "mx-master-3s",
@@ -347,7 +347,7 @@
         "title": "Mouse Logitech MX Master 3s grafito"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:28.382Z"
+      "t": "2026-11-02T10:53:29.521Z"
     },
     {
       "id": "ssd-portatil-1tb",
@@ -370,15 +370,15 @@
         "Arquitectura Blackwell",
         "Compatible con DLSS 4"
       ],
-      "p": 2483759,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-4098740424",
+      "p": 2492631,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-1977570513",
       "img": "https://http2.mlstatic.com/D_NQ_NP_992576-MLA97347707669_112025-F.jpg",
       "ml": {
-        "id": "MLA4098740424",
+        "id": "MLA1977570513",
         "title": "Placa De Video Asus Rog Strix Geforce Rtx 5070 12gb Gaming"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:36.144Z"
+      "t": "2026-11-02T10:53:36.124Z"
     },
     {
       "id": "tv-qled-55",
@@ -389,15 +389,15 @@
         "Panel QLED de 60 Hz",
         "Google TV integrado"
       ],
-      "p": 1288619,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2220827801",
+      "p": 1106279,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-1887106803",
       "img": "https://http2.mlstatic.com/D_NQ_NP_840312-MLA108249322714_032026-F.jpg",
       "ml": {
-        "id": "MLA2220827801",
+        "id": "MLA1887106803",
         "title": "Smart Tv Samsung 55 Qled Q6f 4k Smart Tv"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:38.376Z"
+      "t": "2026-11-02T10:53:37.996Z"
     },
     {
       "id": "power-bank-20000",
@@ -440,7 +440,7 @@
         "title": "Aspiradora inalámbrica De mano Dyson V15 Detect Absolute dorada"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:53.545Z"
+      "t": "2026-11-02T10:53:50.660Z"
     },
     {
       "id": "robot-aspirador",
@@ -451,15 +451,15 @@
         "Succión de 2.500 Pa",
         "Hasta 150 min de autonomía"
       ],
-      "p": 399999,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2060758509",
+      "p": 396999,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-3967661942",
       "img": "https://http2.mlstatic.com/D_NQ_NP_964153-MLA116986640935_082026-F.jpg",
       "ml": {
-        "id": "MLA2060758509",
+        "id": "MLA3967661942",
         "title": "Aspiradora Robot Smartlife RVCL050 Mapeo Laser Barre y Trapea"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:55.198Z"
+      "t": "2026-11-02T10:53:51.967Z"
     },
     {
       "id": "heladera-350",
@@ -478,7 +478,7 @@
         "title": "Heladera No Frost Electrolux Df3900p Plata 350 Lts"
       },
       "src": "ml",
-      "t": "2026-11-01T22:57:58.767Z"
+      "t": "2026-11-02T10:53:55.049Z"
     },
     {
       "id": "lavarropas-8kg",
@@ -497,7 +497,7 @@
         "title": "Lavarropas Carga Frontal 8 Kg Gris Drean Lfdr0814sg0"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:00.303Z"
+      "t": "2026-11-02T10:53:56.453Z"
     },
     {
       "id": "aire-split",
@@ -508,15 +508,15 @@
         "Tecnología inverter",
         "Eficiencia energética A"
       ],
-      "p": 1002567,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-1557129053",
+      "p": 988999,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-3992835254",
       "img": "https://http2.mlstatic.com/D_NQ_NP_877535-MLA100009144171_122025-F.jpg",
       "ml": {
-        "id": "MLA1557129053",
+        "id": "MLA3992835254",
         "title": "Aire Acondicionado Split Hitachi Inverter 2752 Frigorías Frío/Calor"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:04.443Z"
+      "t": "2026-11-02T10:53:59.971Z"
     },
     {
       "id": "olla-multifuncion",
@@ -535,7 +535,7 @@
         "title": "Yelmo Gc-3003 Olla Eléctrica Multifuncion 3 Litros 1000w Color Verde Frecuencia 220"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:08.313Z"
+      "t": "2026-11-02T10:54:03.269Z"
     },
     {
       "id": "freidora-aire",
@@ -559,14 +559,14 @@
         "Tanque de 1,5 L"
       ],
       "p": 369999,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2135945497",
+      "link": "https://articulo.mercadolibre.com.ar/MLA-1683950009",
       "img": "https://http2.mlstatic.com/D_NQ_NP_778703-MLA99949455603_112025-F.jpg",
       "ml": {
-        "id": "MLA2135945497",
+        "id": "MLA1683950009",
         "title": "Cafetera Espresso Oster 15 Bares Bvstem5"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:15.079Z"
+      "t": "2026-11-02T10:54:09.028Z"
     },
     {
       "id": "pava-electrica",
@@ -585,7 +585,7 @@
         "title": "Pava Electrica Digital Aumax Onyxa 1.7 Lts Acero Inoxidable Acero Inoxidable"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:18.958Z"
+      "t": "2026-11-02T10:54:12.421Z"
     },
     {
       "id": "termo-stanley",
@@ -604,7 +604,7 @@
         "title": "Termo Stanley Classic 950ml Rosa"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:22.287Z"
+      "t": "2026-11-02T10:54:15.351Z"
     },
     {
       "id": "stanley-quencher",
@@ -623,7 +623,7 @@
         "title": "Vaso Stanley Quencher Protour de 40 onzas, Colección Messi"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:26.395Z"
+      "t": "2026-11-02T10:54:18.918Z"
     },
     {
       "id": "bici-mtb-29",
@@ -642,7 +642,7 @@
         "title": "Bicicleta Mountain Bike 21 Velocidades Rodado 29 Color Negro Negro 18"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:29.598Z"
+      "t": "2026-11-02T10:54:21.739Z"
     },
     {
       "id": "pelota-futbol-5",
@@ -653,15 +653,15 @@
         "Cuero sintético cosido a máquina",
         "Cámara de butilo"
       ],
-      "p": 31753,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2392152484",
+      "p": 31590,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-3968881972",
       "img": "https://http2.mlstatic.com/D_NQ_NP_622269-MLA99453431556_112025-F.jpg",
       "ml": {
-        "id": "MLA2392152484",
+        "id": "MLA3968881972",
         "title": "Pelota Futbol Reebok Z-go Numero 5 Color Azul"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:31.844Z"
+      "t": "2026-11-02T10:54:23.513Z"
     },
     {
       "id": "carpa-4",
@@ -672,15 +672,15 @@
         "Armado con 2 varillas",
         "Pesa 4,5 kg"
       ],
-      "p": 176997,
-      "link": "https://articulo.mercadolibre.com.ar/MLA-2852021922",
+      "p": 142497,
+      "link": "https://articulo.mercadolibre.com.ar/MLA-4100502576",
       "img": "https://http2.mlstatic.com/D_NQ_NP_727175-MLA101186306042_122025-F.jpg",
       "ml": {
-        "id": "MLA2852021922",
+        "id": "MLA4100502576",
         "title": "Carpa 4 Personas Automática Impermeable Waggs Doble Puerta Azul"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:38.022Z"
+      "t": "2026-11-02T10:54:28.818Z"
     },
     {
       "id": "mochila-trekking-50",
@@ -759,7 +759,7 @@
         "title": "Ukelele Soprano Ibanez Uks10 Caoba"
       },
       "src": "ml",
-      "t": "2026-11-01T22:58:59.423Z"
+      "t": "2026-11-02T10:54:47.023Z"
     }
   ]
 }
