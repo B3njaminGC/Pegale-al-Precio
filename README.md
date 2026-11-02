@@ -55,6 +55,18 @@ La búsqueda abierta de Mercado Libre (`/sites/MLA/search`) está cerrada a apps
 
 Corre todos los días a la madrugada y guarda `data/products.json`. Si un producto no se encuentra, queda con el último dato bueno (o con el precio estimado y sin foto). Si hay al menos 20 productos con datos reales, la app juega solo con esos.
 
+## Miles de productos, sin repetir
+
+`scripts/build-pool.mjs` (corre cada noche en el mismo workflow, después de `fetch-products.mjs`) busca productos reales
+con las palabras de `scripts/pool-seeds.json` y suma los que tienen marca, foto y al menos 3 ofertas nuevas en pesos
+(se descartan accesorios, usados, repuestos y variantes del mismo modelo). Cada corrida suma hasta 500 productos nuevos,
+refresca los precios con más de 6 días y mantiene el pool en un máximo de 4.000. En `data/products.json` queda además
+el plan `daily` con los 5 productos de cada día de las próximas 2 semanas: son los mismos para todos y no se repite ninguno.
+
+En el celular, cada producto que jugaste queda marcado como visto y las partidas rápidas y las salas eligen siempre entre
+los que no viste (cuando ya viste casi todo, vuelve a empezar). Se puede correr a mano desde Actions con "Actualizar productos"
+para sumar más de una vez.
+
 ## Desarrollo
 
 Se necesita Flutter. El APK se puede compilar sin instalar nada, con GitHub Actions. Para probar en la compu:

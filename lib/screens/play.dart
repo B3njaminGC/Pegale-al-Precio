@@ -25,7 +25,7 @@ class PlayScreen extends StatefulWidget {
     return MaterialPageRoute<void>(
       builder: (_) => PlayScreen(
         mode: 'daily',
-        items: dailyItems(env.products, key, 5),
+        items: env.dailyFor(key),
         dailyKey: key,
         saved: env.getJson('pap.dailyprog.$key'), // si ya empezó, retoma donde quedó
       ),
@@ -35,7 +35,7 @@ class PlayScreen extends StatefulWidget {
   static Route<void> quickRoute() => MaterialPageRoute<void>(
         builder: (_) => PlayScreen(
           mode: 'quick',
-          items: pickItems(env.products, math.min(8, env.products.length), math.Random().nextDouble),
+          items: env.pickFreshItems(8),
         ),
       );
 
@@ -60,6 +60,7 @@ class _PlayScreenState extends State<PlayScreen> {
   @override
   void initState() {
     super.initState();
+    env.markSeen(widget.items.map((p) => p.id));
     game = Game.restore(widget.mode, widget.items, widget.saved) ?? Game(mode: widget.mode, items: widget.items);
     _focus.addListener(() {
       if (!_focus.hasFocus) _syncText();

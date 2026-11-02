@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final prog = env.getJson('pap.dailyprog.$key');
     final progRound = prog is Map && prog['round'] is num ? (prog['round'] as num).toInt() : 0;
     final inProgress = !played && progRound > 0;
-    final sheet = dailyItems(env.products, key, 5).take(3).toList();
+    final sheet = env.dailyFor(key).take(3).toList();
 
     return Scaffold(
       body: SafeArea(

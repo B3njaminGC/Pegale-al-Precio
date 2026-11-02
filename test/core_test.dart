@@ -110,4 +110,25 @@ void main() {
     expect(ok.buyUrl, 'https://articulo.mercadolibre.com.ar/MLA-1');
     expect(bad.buyUrl, 'https://listado.mercadolibre.com.ar/z');
   });
+
+  test('pickFresh no repite lo visto y reparte categorías', () {
+    final ps = List.generate(
+        60, (i) => Product(id: 'p$i', n: 'p$i', c: 'C${i % 6}', s: ['a'], p: 100000));
+    final seen = <String>{};
+    final rng = mulberry32(7);
+    for (var round = 0; round < 7; round++) {
+      final pick = pickFresh(ps, 8, seen, rng);
+      expect(pick.length, 8);
+      expect(pick.map((p) => p.id).toSet().length, 8);
+      expect(pick.where((p) => seen.contains(p.id)), isEmpty, reason: 'ronda $round');
+      final perCat = <String, int>{};
+      for (final p in pick) {
+        perCat[p.c] = (perCat[p.c] ?? 0) + 1;
+      }
+      if (round < 3) expect(perCat.values.every((n) => n <= 2), isTrue);
+      seen.addAll(pick.map((p) => p.id));
+    }
+    // quedan 4 sin ver: elige entre todos y devuelve igual 8
+    expect(pickFresh(ps, 8, seen, rng).length, 8);
+  });
 }

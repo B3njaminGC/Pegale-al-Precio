@@ -321,6 +321,30 @@ List<int> pickIndices(int n, int len, double Function() rng) {
 List<Product> pickItems(List<Product> products, int n, double Function() rng) =>
     pickIndices(n, products.length, rng).map((i) => products[i]).toList();
 
+/// Elige n productos que no se vieron todavía, con pocas repeticiones de categoría.
+/// Si quedan menos de n sin ver, elige entre todos.
+List<Product> pickFresh(List<Product> products, int n, Set<String> seen, double Function() rng, {int perCat = 2}) {
+  var pool = products.where((p) => !seen.contains(p.id)).toList();
+  if (pool.length < n) pool = List<Product>.from(products);
+  final idx = pickIndices(pool.length, pool.length, rng);
+  final out = <Product>[];
+  final count = <String, int>{};
+  for (final i in idx) {
+    if (out.length >= n) break;
+    final p = pool[i];
+    final c = count[p.c] ?? 0;
+    if (c >= perCat) continue;
+    count[p.c] = c + 1;
+    out.add(p);
+  }
+  for (final i in idx) {
+    if (out.length >= n) break;
+    final p = pool[i];
+    if (!out.contains(p)) out.add(p);
+  }
+  return out;
+}
+
 /// El lote del día sale de la lista ordenada por id, así no depende del orden del archivo.
 List<Product> dailyItems(List<Product> products, String dateKey, [int n = 5]) {
   final sorted = List<Product>.from(products)..sort((a, b) => a.id.compareTo(b.id));

@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -73,7 +72,7 @@ class _RoomsScreenState extends State<RoomsScreen> {
     if (name == null) return;
     setState(() => busyCreate = true);
     try {
-      final items = pickItems(env.products, rounds < env.products.length ? rounds : env.products.length, math.Random().nextDouble);
+      final items = env.pickFreshItems(rounds);
       final code = await env.net.createRoom(items, name);
       if (!mounted) return;
       await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => RoomScreen(code: code)));

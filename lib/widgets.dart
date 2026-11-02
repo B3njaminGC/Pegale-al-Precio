@@ -158,6 +158,18 @@ class Plate extends StatelessWidget {
     'Componentes': Icons.memory_rounded,
     'Televisores': Icons.tv_rounded,
     'Mate': Icons.coffee_rounded,
+    'Muebles': Icons.weekend_rounded,
+    'Herramientas': Icons.build_rounded,
+    'Jardín': Icons.yard_rounded,
+    'Calzado': Icons.hiking_rounded,
+    'Belleza': Icons.spa_rounded,
+    'Salud': Icons.favorite_rounded,
+    'Bebés': Icons.child_care_rounded,
+    'Juguetes': Icons.toys_rounded,
+    'Mascotas': Icons.pets_rounded,
+    'Automotor': Icons.directions_car_rounded,
+    'Bicicletas': Icons.pedal_bike_rounded,
+    'Videojuegos': Icons.sports_esports_rounded,
   };
 
   /// Sin foto: un ícono de la categoría, sin texto, para que la placa no quede vacía ni desprolija.
