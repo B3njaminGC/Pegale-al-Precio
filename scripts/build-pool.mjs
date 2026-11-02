@@ -18,7 +18,8 @@
  *   POOL_NEW_MAX     productos nuevos por corrida (500)    POOL_REFRESH_MAX  precios a refrescar por corrida (300)
  *   POOL_MAX         tope del pool (4000)                   POOL_PER_QUERY    nuevos por búsqueda (10)
  *   POOL_MINUTES     presupuesto de tiempo (40)             POOL_DAILY_DAYS   días de plan por adelantado (14)
- *   POOL_STALE_DAYS  antigüedad para refrescar (6)          DELAY_MS          pausa entre pedidos (250)
+ *   POOL_STALE_DAYS  antigüedad para refrescar (6)          DELAY_MS          pausa entre pedidos (120)
+ *   POOL_CONCURRENCY consultas de ofertas en paralelo (6)
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -30,7 +31,8 @@ const SITE = 'MLA';
 const OUT = process.env.PRODUCTS_OUT || path.join(ROOT, 'data/products.json');
 const SKIP_FILE = process.env.POOL_SKIP_FILE || path.join(path.dirname(OUT), 'pool-skip.json');
 const num = (k, d) => (process.env[k] !== undefined && process.env[k] !== '' ? Number(process.env[k]) : d);
-const DELAY = num('DELAY_MS', 250);
+const DELAY = num('DELAY_MS', 120);
+const CONC = num('POOL_CONCURRENCY', 6);
 const NEW_MAX = num('POOL_NEW_MAX', 500);
 const REFRESH_MAX = num('POOL_REFRESH_MAX', 300);
 const POOL_MAX = num('POOL_MAX', 4000);
@@ -402,25 +404,35 @@ async function main() {
       continue;
     }
 
-    let taken = 0, tried = 0;
+    const cands = [];
     for (const prod of found) {
-      if (taken >= PER_QUERY || tried >= PER_QUERY * 2 || stats.added >= NEW_MAX || kept.length >= POOL_MAX || overTime()) break;
       if (byId.has(prod.id) || skip.has(prod.id)) continue;
       if (!isCandidate(prod)) { stats.rejected++; continue; }
-      const fam = prod.parent_id || prod.id, nk = famKey(prod.name);
-      if (families.has(fam) || names.has(nk)) { stats.rejected++; continue; }
-      stats.candidates++;
-      tried++;
-      let offers;
-      try { offers = await offersOf(prod.id); } catch { stats.errors++; continue; }
-      if (!offers) { skip.add(prod.id); stats.noOffers++; continue; }
-      const item = buildItem(prod, offers, c, now);
-      if (!item) { skip.add(prod.id); stats.rejected++; continue; }
-      kept.push(item);
-      byId.set(item.id, item);
-      families.add(fam); names.add(nk);
-      stats.added++; taken++;
-      perCat[c] = (perCat[c] || 0) + 1;
+      if (families.has(prod.parent_id || prod.id) || names.has(famKey(prod.name))) { stats.rejected++; continue; }
+      cands.push(prod);
+    }
+    // Casi todos los productos del catálogo no tienen ofertas: se consultan de a varios a la vez.
+    let taken = 0;
+    for (let k = 0; k < cands.length && k < PER_QUERY * 5; k += CONC) {
+      if (taken >= PER_QUERY || stats.added >= NEW_MAX || kept.length >= POOL_MAX || overTime()) break;
+      const res = await Promise.all(cands.slice(k, k + CONC).map(async prod => {
+        try { return { prod, offers: await offersOf(prod.id) }; } catch { return { prod, error: true }; }
+      }));
+      for (const { prod, offers, error } of res) {
+        stats.candidates++;
+        if (error) { stats.errors++; continue; }
+        if (!offers) { skip.add(prod.id); stats.noOffers++; continue; }
+        const fam = prod.parent_id || prod.id, nk = famKey(prod.name);
+        if (families.has(fam) || names.has(nk)) { stats.rejected++; continue; }
+        if (taken >= PER_QUERY || stats.added >= NEW_MAX) continue;
+        const item = buildItem(prod, offers, c, now);
+        if (!item) { skip.add(prod.id); stats.rejected++; continue; }
+        kept.push(item);
+        byId.set(item.id, item);
+        families.add(fam); names.add(nk);
+        stats.added++; taken++;
+        perCat[c] = (perCat[c] || 0) + 1;
+      }
     }
   }
 
