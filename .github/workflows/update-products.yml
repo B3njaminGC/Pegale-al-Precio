@@ -4,6 +4,13 @@ on:
   schedule:
     - cron: "5 3 * * *"   # todos los días a las 00:05 de Argentina
   workflow_dispatch:
+    inputs:
+      nuevos:
+        description: "Productos nuevos a sumar al pool en esta corrida"
+        default: "500"
+      minutos:
+        description: "Tiempo máximo de búsqueda (minutos)"
+        default: "40"
 
 permissions:
   contents: write
@@ -15,6 +22,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - name: Bajar el código
         uses: actions/checkout@v4
@@ -30,14 +38,23 @@ jobs:
           ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
         run: node scripts/fetch-products.mjs
 
+      - name: Sumar productos al pool y armar el plan diario
+        env:
+          ML_CLIENT_ID: ${{ secrets.ML_CLIENT_ID }}
+          ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
+          POOL_NEW_MAX: ${{ inputs.nuevos || '500' }}
+          POOL_MINUTES: ${{ inputs.minutos || '40' }}
+        run: node scripts/build-pool.mjs
+
       - name: Guardar los cambios
         run: |
-          if git diff --quiet -- data/products.json; then
+          if [ -z "$(git status --porcelain -- data)" ]; then
             echo "Sin cambios."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/products.json
+          git add data/products.json data/pool-skip.json
           git commit -m "Actualiza productos y precios"
+          git pull --rebase origin main || true
           git push

@@ -117,15 +117,28 @@ function estimated(entry) {
 }
 
 function write(items) {
+  // Los productos descubiertos por build-pool.mjs y el plan de desafíos diarios se conservan.
+  let extras = [], daily, pool;
+  if (!SEED) {
+    try {
+      const prev = JSON.parse(fs.readFileSync(OUT, 'utf8'));
+      const ids = new Set(items.map(i => i.id));
+      extras = (prev.items || []).filter(i => !ids.has(i.id));
+      daily = prev.daily;
+      pool = prev.pool;
+    } catch { /* primera vez */ }
+  }
   const doc = {
     version: 1,
     updated: new Date().toISOString(),
     site: SITE,
     source: SEED ? 'estimado' : 'api.mercadolibre.com',
-    items,
+    ...(daily ? { daily } : {}),
+    ...(pool ? { pool } : {}),
+    items: [...items, ...extras],
   };
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify(doc, null, 2) + '\n');
+  fs.writeFileSync(OUT, JSON.stringify(doc) + '\n');
 }
 
 /* ---------- búsqueda de un producto ---------- */
