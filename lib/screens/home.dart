@@ -85,10 +85,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Sube al ranking el resultado de hoy si todavía no se mandó (por ejemplo, si se jugó antes de activar el ranking).
+  /// Fecha del último resultado (hoy o ayer) que todavía no se subió al ranking.
+  String? _pendingKey() {
+    final today = arDateKey();
+    final yest = arDateKey(DateTime.now().subtract(const Duration(days: 1)));
+    for (final k in [today, yest]) {
+      final r = env.getJson('pap.daily.$k');
+      if (r is Map && r['score'] is num && r['submitted'] != true) return k;
+    }
+    return null;
+  }
+
   Future<void> _sendRank({bool ask = false}) async {
-    final key = arDateKey();
+    final key = _pendingKey();
+    if (key == null || !env.net.enabled || _sending) return;
     final rec = env.getJson('pap.daily.$key');
-    if (rec is! Map || rec['submitted'] == true || !env.net.enabled || _sending) return;
+    if (rec is! Map) return;
     if (env.name.isEmpty) {
       if (!ask) return;
       final n = await _askName();
@@ -234,13 +246,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text('Ranking de hoy: puesto ${(rec['rank'] as num).toInt()} de ${(rec['of'] as num?)?.toInt() ?? '?'}',
                         style: sans(13, color: C.muted)),
                   ],
-                ] else
+                ] else ...[
                   Text(
                     inProgress
                         ? 'Ya empezaste el desafío de hoy: no se puede reiniciar.'
                         : 'Una sola partida por día. Se renueva a las 00:00.',
                     style: mono(12, color: C.muted),
                   ),
+                  if (env.net.enabled && _pendingKey() != null) ...[
+                    const SizedBox(height: 12),
+                    Text('Tu resultado de ayer todavía no está en el ranking.', style: sans(13, color: C.gold)),
+                    const SizedBox(height: 8),
+                    SecondaryButton(_sending ? 'Enviando…' : 'Subir mi resultado al ranking',
+                        height: 44, onPressed: _sending ? null : () => _sendRank(ask: true)),
+                  ],
+                ],
                 const SizedBox(height: 16),
                 PrimaryButton(
                   played ? 'Desafío completado' : (inProgress ? 'Seguir el desafío · producto ${progRound + 1} de 5' : 'Jugar el desafío'),

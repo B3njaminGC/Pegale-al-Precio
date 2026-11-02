@@ -36,7 +36,8 @@ class _RankScreenState extends State<RankScreen> {
     });
     try {
       final key = arDateKey();
-      final r = await env.net.top(k, k == 'daily' ? key : weekStartKey(key), 50);
+      final yest = arDateKey(DateTime.now().subtract(const Duration(days: 1)));
+      final r = await env.net.top(k == 'weekly' ? 'weekly' : 'daily', k == 'daily' ? key : (k == 'yday' ? yest : weekStartKey(key)), 50);
       if (!mounted || kind != k) return;
       setState(() {
         result = r;
@@ -56,7 +57,9 @@ class _RankScreenState extends State<RankScreen> {
     final key = arDateKey();
     final lead = kind == 'daily'
         ? 'Desafío del ${prettyDate(key)}. Cuenta la primera partida de cada jugador.'
-        : 'Suma de los desafíos de la semana que empezó el lunes ${prettyDate(weekStartKey(key))}.';
+        : kind == 'yday'
+            ? 'Desafío de ayer, ${prettyDate(arDateKey(DateTime.now().subtract(const Duration(days: 1))))}.'
+            : 'Suma de los desafíos de la semana que empezó el lunes ${prettyDate(weekStartKey(key))}.';
     final r = result;
     return Scaffold(
       body: SafeArea(
@@ -65,7 +68,7 @@ class _RankScreenState extends State<RankScreen> {
           children: [
             TopBar(title: 'Ranking Argentina', onBack: () => Navigator.of(context).pop()),
             Row(children: [
-              for (final t in const [['daily', 'Hoy'], ['weekly', 'Semana']])
+              for (final t in const [['daily', 'Hoy'], ['yday', 'Ayer'], ['weekly', 'Semana']])
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
