@@ -111,6 +111,7 @@ export function buildFicha(attrs, max = 3) {
     if (DENIED.test(a.id)) continue;
     const name = String(a.name).trim(), value = String(a.value_name).trim();
     if (!name || !value || value.length > 30 || name.length > 28) continue;
+    if (/^(modelo|marca|l[ií]nea|nombre|c[oó]digo|versi[oó]n|referencia)\b/i.test(name)) continue; // revelan el producto
     if (/[$]|^\s*(no|n\/a|ninguno|sin especificar)\s*$/i.test(value)) continue;
     if (seen.has(a.id) || seen.has(name.toLowerCase())) continue;
     seen.add(a.id); seen.add(name.toLowerCase());
