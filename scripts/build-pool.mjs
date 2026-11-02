@@ -307,7 +307,6 @@ async function main() {
   const overTime = () => Date.now() - started > MINUTES * 60 * 1000;
   const doc = readJson(OUT, null);
   if (!doc || !Array.isArray(doc.items)) { console.error(`No hay ${OUT}. Corré primero fetch-products.mjs`); process.exit(1); }
-  const seeds = readJson(path.join(ROOT, 'scripts/pool-seeds.json'), {});
   const catalog = readJson(path.join(ROOT, 'scripts/catalog.json'), { items: [] });
   const curated = new Set(catalog.items.map(i => i.id));
   const skipDoc = readJson(SKIP_FILE, { ids: [] });
@@ -369,9 +368,13 @@ async function main() {
     if (i.ml && i.ml.fam) families.add(i.ml.fam);
   }
   const queries = [];
-  const cats = Object.keys(seeds);
-  const maxLen = Math.max(0, ...cats.map(c => seeds[c].length));
-  for (let k = 0; k < maxLen; k++) for (const c of cats) if (seeds[c][k]) queries.push({ c, q: seeds[c][k] });
+  // las búsquedas se reparten por categoría (una de cada una por vez); el segundo archivo va a continuación del primero
+  for (const file of ['pool-seeds.json', 'pool-seeds-2.json']) {
+    const set = readJson(path.join(ROOT, 'scripts', file), {});
+    const cats = Object.keys(set);
+    const maxLen = Math.max(0, ...cats.map(c => set[c].length));
+    for (let k = 0; k < maxLen; k++) for (const c of cats) if (set[c][k]) queries.push({ c, q: set[c][k] });
+  }
   const cursor = Number(doc.pool && doc.pool.cursor) || 0;
   let qi = 0, pageLimit = 50;
 
