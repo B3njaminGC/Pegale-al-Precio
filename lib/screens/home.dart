@@ -39,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (mounted) setState(() {});
     _sendRank();
+    await env.checkUpdate();
+    if (mounted) setState(() {});
   }
 
   String get _fine {
@@ -194,6 +196,33 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ]),
             const SizedBox(height: 14),
+            if (env.newerVersion != null) ...[
+              Panel(
+                color: const Color(0xFF16304D),
+                border: C.accent,
+                padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+                child: Row(children: [
+                  const Icon(Icons.system_update_rounded, color: C.accent),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text('Hay una versión nueva (${env.newerVersion})', style: sans(14, w: FontWeight.w600)),
+                  ),
+                  TextButton(
+                    onPressed: () => openUrl(context, kDownloadUrl),
+                    child: Text('Bajar', style: sans(14, w: FontWeight.w700, color: C.accent)),
+                  ),
+                  IconButton(
+                    tooltip: 'Ocultar',
+                    icon: const Icon(Icons.close_rounded, size: 20, color: C.muted),
+                    onPressed: () async {
+                      await env.dismissUpdate();
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ]),
+              ),
+              const SizedBox(height: 12),
+            ],
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -294,7 +323,25 @@ class _HomeScreenState extends State<HomeScreen> {
             const _How('01', 'Mirá el producto.', 'Foto y ficha técnica, sin el precio.'),
             const _How('02', 'Fijá tu precio.', 'Cuanto más cerca, más puntos. Las rachas multiplican.'),
             const _How('03', 'Compará.', 'Se revela el precio real y podés ir a la publicación.'),
-            const SizedBox(height: 10),
+            const SizedBox(height: 18),
+            Panel(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Icon(Icons.favorite_rounded, color: C.accent, size: 20),
+                  const SizedBox(width: 8),
+                  Text('Colaborá con el proyecto', style: sans(15, w: FontWeight.w700)),
+                ]),
+                const SizedBox(height: 6),
+                Text('El juego es gratis y sin publicidad. Si te gusta y querés darme una mano, podés mandarme una colaboración al alias de Mercado Pago:',
+                    style: sans(13, color: C.muted, h: 1.4)),
+                const SizedBox(height: 12),
+                SecondaryButton(
+                  '$kDonateAlias  ·  Copiar',
+                  onPressed: () => copyText(context, kDonateAlias, 'Alias copiado. ¡Gracias!'),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 14),
             Text(_fine, style: sans(12, color: C.faint, h: 1.4)),
             const SizedBox(height: 6),
             Text('Versión $kVersion', style: mono(11, color: C.faint)),

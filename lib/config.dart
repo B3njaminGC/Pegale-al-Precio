@@ -14,3 +14,9 @@ const String kDownloadUrl = 'https://github.com/B3njaminGC/Pegale-al-Precio/rele
 
 /// Versión de esta compilación (la completa el workflow). Se muestra al pie del inicio.
 const String kVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'dev');
+
+/// Alias de Mercado Pago para colaborar con el proyecto (es público a propósito: solo sirve para recibir plata).
+const String kDonateAlias = 'b3njamin.dev.mp';
+
+/// Última versión publicada, para avisar cuando hay una nueva.
+const String kLatestUrl = 'https://api.github.com/repos/B3njaminGC/Pegale-al-Precio/releases/latest';

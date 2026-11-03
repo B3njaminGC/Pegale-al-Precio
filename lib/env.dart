@@ -27,6 +27,9 @@ class Env {
   Set<String> seen = <String>{};
   File? _cache;
 
+  /// Etiqueta de la versión nueva (por ejemplo v2.5.0) si hay una más reciente que esta app y todavía no la descartó.
+  String? newerVersion;
+
   /* ----- guardado local ----- */
 
   dynamic getJson(String key) {
@@ -147,6 +150,41 @@ class Env {
     } catch (_) {
       return false;
     }
+  }
+
+  static List<int>? _parseVersion(String v) {
+    final m = RegExp(r'^v(\d+)\.(\d+)\.(\d+)$').firstMatch(v.trim());
+    return m == null ? null : [for (var i = 1; i <= 3; i++) int.parse(m.group(i)!)];
+  }
+
+  /// Mira cuál es la última versión publicada. Las compilaciones de prueba (sin número de versión) no avisan.
+  Future<void> checkUpdate() async {
+    try {
+      final mine = _parseVersion(kVersion);
+      if (mine == null) return;
+      final r = await http
+          .get(Uri.parse(kLatestUrl), headers: {'accept': 'application/vnd.github+json'})
+          .timeout(const Duration(seconds: 8));
+      if (r.statusCode != 200) return;
+      final doc = jsonDecode(r.body);
+      final tag = doc is Map ? '${doc['tag_name'] ?? ''}' : '';
+      final theirs = _parseVersion(tag);
+      if (theirs == null) return;
+      var newer = false;
+      for (var i = 0; i < 3; i++) {
+        if (theirs[i] != mine[i]) {
+          newer = theirs[i] > mine[i];
+          break;
+        }
+      }
+      newerVersion = newer && prefs.getString('pap.upd.dismissed') != tag ? tag : null;
+    } catch (_) {}
+  }
+
+  Future<void> dismissUpdate() async {
+    final t = newerVersion;
+    newerVersion = null;
+    if (t != null) await prefs.setString('pap.upd.dismissed', t);
   }
 
   /// Aplica lo que bajó refreshProducts (se hace entre partidas para no cambiar los productos en medio de una).

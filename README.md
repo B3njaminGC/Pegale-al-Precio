@@ -67,6 +67,10 @@ En el celular, cada producto que jugaste queda marcado como visto y las partidas
 los que no viste (cuando ya viste casi todo, vuelve a empezar). Se puede correr a mano desde Actions con "Actualizar productos"
 para sumar más de una vez.
 
+## Colaborar
+
+El juego es gratis y sin publicidad. Si querés colaborar: alias de Mercado Pago **b3njamin.dev.mp**.
+
 ## Desarrollo
 
 Se necesita Flutter. El APK se puede compilar sin instalar nada, con GitHub Actions. Para probar en la compu:
