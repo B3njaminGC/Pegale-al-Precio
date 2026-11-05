@@ -8,6 +8,7 @@ import '../env.dart';
 import '../net.dart';
 import '../theme.dart';
 import '../widgets.dart';
+import '../update/update_dialog.dart';
 import 'play.dart';
 import 'rank.dart';
 import 'rooms.dart';
@@ -208,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text('Hay una versión nueva (${env.newerVersion})', style: sans(14, w: FontWeight.w600)),
                   ),
                   TextButton(
-                    onPressed: () => openUrl(context, kDownloadUrl),
+                    onPressed: () => showDownloadDialog(context, version: env.newerVersion ?? '', apkUrl: env.newerApkUrl),
                     child: Text('Bajar', style: sans(14, w: FontWeight.w700, color: C.accent)),
                   ),
                   IconButton(

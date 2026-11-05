@@ -60,6 +60,7 @@ jobs:
           s = open(p, encoding='utf-8').read()
           s = re.sub(r'android:label="[^"]*"', 'android:label="Pegale al Precio"', s, count=1)
           extra = ('\n    <uses-permission android:name="android.permission.INTERNET"/>'
+                   '\n    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>'
                    '\n    <queries>\n        <intent>\n            <action android:name="android.intent.action.VIEW"/>\n'
                    '            <data android:scheme="https"/>\n        </intent>\n    </queries>')
           s = re.sub(r'(<manifest[^>]*>)', lambda m: m.group(1) + extra, s, count=1)
@@ -87,7 +88,7 @@ jobs:
           open(p, 'w', encoding='utf-8').write(s)
           print('firma configurada en', p)
           PY
-          grep -n "label\|INTERNET\|screenOrientation" android/app/src/main/AndroidManifest.xml | tee -a ci.log
+          grep -n "label\|INTERNET\|REQUEST_INSTALL\|screenOrientation" android/app/src/main/AndroidManifest.xml | tee -a ci.log
 
       - name: Bajar dependencias
         run: flutter pub get 2>&1 | tee -a ci.log

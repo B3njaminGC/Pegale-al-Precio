@@ -30,6 +30,9 @@ class Env {
   /// Etiqueta de la versión nueva (por ejemplo v2.5.0) si hay una más reciente que esta app y todavía no la descartó.
   String? newerVersion;
 
+  /// Dónde bajar el APK de esa versión (null si la release no trae uno).
+  String? newerApkUrl;
+
   /* ----- guardado local ----- */
 
   dynamic getJson(String key) {
@@ -178,6 +181,19 @@ class Env {
         }
       }
       newerVersion = newer && prefs.getString('pap.upd.dismissed') != tag ? tag : null;
+      newerApkUrl = null;
+      final assets = doc is Map ? doc['assets'] : null;
+      if (newerVersion != null && assets is List) {
+        for (final a in assets) {
+          if (a is! Map) continue;
+          final name = '${a['name'] ?? ''}'.toLowerCase();
+          final url = '${a['browser_download_url'] ?? ''}';
+          if (name.endsWith('.apk') && url.startsWith('https://github.com/')) {
+            newerApkUrl = url;
+            break;
+          }
+        }
+      }
     } catch (_) {}
   }
 
