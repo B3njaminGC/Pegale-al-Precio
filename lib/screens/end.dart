@@ -5,6 +5,7 @@ import '../config.dart';
 import '../core.dart';
 import '../env.dart';
 import '../net.dart';
+import '../share_card.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import 'play.dart';
@@ -29,6 +30,7 @@ class _EndScreenState extends State<EndScreen> {
   String note = '';
   _Board board = _Board.none;
   String boardText = '';
+  int _streak = 0;
 
   String get _key => widget.dateKey ?? arDateKey();
   bool get daily => widget.mode == 'daily';
@@ -48,7 +50,10 @@ class _EndScreenState extends State<EndScreen> {
     } else if (widget.practice) {
       note = 'Partida de práctica. En el ranking cuenta tu primera partida del día.';
     } else {
-      env.setJson('pap.daily.${_key}', {'score': g.total, 'base': g.base, 'grid': shareGrid(g.log)});
+      env.setJson('pap.daily.${_key}', {'score': g.total, 'base': g.base, 'grid': shareGrid(g.log)}).then((_) async {
+        final s = await env.noteStreak();
+        if (mounted) setState(() => _streak = s);
+      });
     }
     _initBoard();
   }
@@ -142,9 +147,21 @@ class _EndScreenState extends State<EndScreen> {
 
   String get _label => daily ? 'Desafío del ${prettyDate(_key)}' : 'Partida rápida';
 
-  void _share() {
-    final text = 'Pegale al Precio · $_label\n${num0(g.total)} puntos · ${rankOf(g.base / g.items.length)}\n${shareGrid(g.log)}\n$kDownloadUrl';
-    Share.share(text);
+  bool _sharing = false;
+
+  Future<void> _share() async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    final text =
+        '${shareHeadline(g)} en Pegale al Precio 🎯 ${num0(g.total)} puntos\n${shareGrid(g.log)}\n¿Le pegás vos? $kDownloadUrl';
+    try {
+      final file = await renderShareCard(label: _label, g: g, streak: daily && !widget.practice ? _streak : 0);
+      await Share.shareXFiles([XFile(file.path, mimeType: 'image/png')], text: text);
+    } catch (_) {
+      // si no se pudo armar la imagen, se comparte solo el texto
+      await Share.share(text);
+    }
+    if (mounted) setState(() => _sharing = false);
   }
 
   Widget _boardPanel() {
@@ -219,6 +236,10 @@ class _EndScreenState extends State<EndScreen> {
             ],
             const SizedBox(height: 4),
             Text(shareGrid(g.log), style: const TextStyle(fontSize: 22, letterSpacing: 2)),
+            if (daily && !widget.practice && _streak >= 1) ...[
+              const SizedBox(height: 12),
+              StreakChip(days: _streak, best: env.bestStreak),
+            ],
             _boardPanel(),
             const SizedBox(height: 18),
             for (var i = 0; i < g.log.length; i++) _recapRow(g.items[i], g.log[i]),
@@ -227,7 +248,7 @@ class _EndScreenState extends State<EndScreen> {
               Navigator.of(context).pushReplacement(PlayScreen.quickRoute());
             }),
             const SizedBox(height: 10),
-            SecondaryButton('Compartir resultado', onPressed: _share),
+            SecondaryButton(_sharing ? 'Armando la imagen…' : 'Compartir resultado', onPressed: _sharing ? null : _share),
             const SizedBox(height: 10),
             SecondaryButton('Volver al inicio', onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst)),
           ],

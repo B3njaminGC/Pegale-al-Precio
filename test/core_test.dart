@@ -131,4 +131,44 @@ void main() {
     // quedan 4 sin ver: elige entre todos y devuelve igual 8
     expect(pickFresh(ps, 8, seen, rng).length, 8);
   });
+
+  test('las pistas dan un rango que contiene el precio y el nivel 2 es más ajustado', () {
+    for (var i = 0; i < 40; i++) {
+      final p = Product(id: 'x$i', n: 'x', c: 'C', s: ['a'], p: 15000 + i * 37000);
+      final r1 = hintRange(p, 1);
+      final r2 = hintRange(p, 2);
+      expect(r1[0] <= p.p && p.p <= r1[1], isTrue, reason: 'nivel 1 · ${p.p}');
+      expect(r2[0] <= p.p && p.p <= r2[1], isTrue, reason: 'nivel 2 · ${p.p}');
+      expect(r2[1] - r2[0] <= r1[1] - r1[0], isTrue);
+      expect(hintRange(p, 1), r1, reason: 'siempre da lo mismo');
+    }
+  });
+
+  test('las pistas restan puntos pero no bajan de cero', () {
+    final p = Product(id: 'a', n: 'a', c: 'C', s: ['a'], p: 100000);
+    final g = Game(mode: 'quick', items: [p, p]);
+    final e = g.guess(100000, hint: 100);
+    expect(e.pts, 1200 - 100); // base 1000 + exacto 200
+    expect(e.hint, 100);
+    final e2 = g.guess(100000, hint: 5000);
+    expect(e2.pts, 0);
+    expect(g.total, 1100);
+    // se guarda y se recupera
+    final back = Game.restore('quick', [p, p], g.toJson());
+    expect(back!.log.first.hint, 100);
+  });
+
+  test('la racha cuenta días seguidos y no se corta si hoy todavía no jugaste', () {
+    final played = {'2026-11-08', '2026-11-09', '2026-11-10', '2026-11-12'};
+    bool f(String k) => played.contains(k);
+    expect(dailyStreak(f, '2026-11-10'), 3);
+    expect(dailyStreak(f, '2026-11-11'), 3, reason: 'hoy no jugó pero ayer sí');
+    expect(dailyStreak(f, '2026-11-12'), 1);
+    expect(dailyStreak(f, '2026-11-14'), 0);
+    expect(shiftDateKey('2026-12-31', 1), '2027-01-01');
+    expect(shiftDateKey('2026-03-01', -1), '2026-02-28');
+    expect(streakBadge(2), '');
+    expect(streakBadge(3), 'Entrando en calor');
+    expect(streakBadge(30), 'Leyenda');
+  });
 }

@@ -168,6 +168,7 @@ class LogEntry {
     required this.bonus,
     required this.mult,
     required this.err,
+    this.hint = 0,
   });
 
   final String id;
@@ -179,6 +180,9 @@ class LogEntry {
   final double mult;
   final double err;
 
+  /// Puntos que costaron las pistas usadas en este producto.
+  final int hint;
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'guess': guess,
@@ -188,6 +192,7 @@ class LogEntry {
         'bonus': bonus,
         'mult': mult,
         'err': err,
+        'hint': hint,
       };
 
   static LogEntry fromJson(Map j) => LogEntry(
@@ -199,6 +204,7 @@ class LogEntry {
         bonus: (j['bonus'] as num).toInt(),
         mult: (j['mult'] as num).toDouble(),
         err: (j['err'] as num).toDouble(),
+        hint: (j['hint'] as num?)?.toInt() ?? 0,
       );
 }
 
@@ -216,11 +222,12 @@ class Game {
   Product get current => items[round];
   bool get done => round >= items.length;
 
-  LogEntry guess(int price) {
+  /// [hint] son los puntos que costaron las pistas usadas: se restan de lo que sumó este producto.
+  LogEntry guess(int price, {int hint = 0}) {
     final it = items[round];
     final r = roundScore(price, it.p);
     final mult = multOf(streak);
-    final pts = ((r.base + r.bonus) * mult).round();
+    final pts = math.max(0, ((r.base + r.bonus) * mult).round() - hint);
     final entry = LogEntry(
       id: it.id,
       guess: price,
@@ -230,6 +237,7 @@ class Game {
       bonus: r.bonus,
       mult: mult,
       err: r.rel,
+      hint: hint,
     );
     total += pts;
     base += r.base;
@@ -279,6 +287,59 @@ double? avgError(List<int>? guesses, List<Product> items) {
     n++;
   }
   return n == 0 ? null : sum / n;
+}
+
+/* ----- pistas ----- */
+
+/// Costo acumulado de cada nivel de pista: 1 = rango amplio, 2 = rango ajustado.
+const List<int> kHintCosts = [100, 250];
+
+int _nice(double v, {required bool up}) {
+  if (v < 100) return up ? v.ceil() : v.floor();
+  final mag = math.pow(10, (math.log(v) / math.ln10).floor() - 1).toDouble();
+  final q = v / mag;
+  return ((up ? q.ceil() : q.floor()) * mag).round();
+}
+
+/// Rango donde está el precio real, sin que quede centrado (el corrimiento sale del id del producto).
+/// Devuelve [desde, hasta]. Nivel 1 es amplio y nivel 2 es más ajustado.
+List<int> hintRange(Product it, int level) {
+  final h = hashStr('hint-${it.id}');
+  final h1 = (h & 0xFFFF) / 65535;
+  final h2 = ((h >> 16) & 0xFFFF) / 65535;
+  final base = level >= 2 ? 1.12 : 1.5;
+  final spread = level >= 2 ? 0.18 : 0.6;
+  final lo = _nice(it.p / (base + h1 * spread), up: false);
+  final hi = _nice(it.p * (base + h2 * spread), up: true);
+  return [math.max(lo, kMin), math.min(hi, kMax)];
+}
+
+/* ----- rachas de días ----- */
+
+/// La fecha `days` días después (o antes, si es negativo) de esa fecha.
+String shiftDateKey(String key, int days) {
+  final p = key.split('-').map(int.parse).toList();
+  return _dateKeyOf(DateTime.utc(p[0], p[1], p[2]).add(Duration(days: days)));
+}
+
+/// Días seguidos jugando el desafío. Si hoy todavía no jugaste, la racha sigue viva hasta que termine el día.
+int dailyStreak(bool Function(String key) played, String today) {
+  var k = played(today) ? today : shiftDateKey(today, -1);
+  var n = 0;
+  while (n < 3650 && played(k)) {
+    n++;
+    k = shiftDateKey(k, -1);
+  }
+  return n;
+}
+
+/// Insignia que corresponde a esa cantidad de días seguidos (vacío si todavía no llega a ninguna).
+String streakBadge(int days) {
+  if (days >= 30) return 'Leyenda';
+  if (days >= 14) return 'Imparable';
+  if (days >= 7) return 'Una semana';
+  if (days >= 3) return 'Entrando en calor';
+  return '';
 }
 
 /* ----- azar repetible (mismo resultado en cualquier celular) ----- */

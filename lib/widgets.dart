@@ -215,3 +215,39 @@ class Plate extends StatelessWidget {
     );
   }
 }
+
+
+/// Racha de días seguidos jugando el desafío, con su insignia.
+class StreakChip extends StatelessWidget {
+  const StreakChip({super.key, required this.days, this.best = 0, this.atRisk = false});
+  final int days;
+  final int best;
+
+  /// Hoy todavía no jugó: la racha se pierde si no juega antes de las 00:00.
+  final bool atRisk;
+
+  @override
+  Widget build(BuildContext context) {
+    final badge = streakBadge(days);
+    final sub = atRisk ? 'Jugá hoy para no perderla' : (best > days ? 'Tu mejor racha: $best' : (days >= 2 ? 'Tu mejor racha' : 'Volvé mañana'));
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1B1708),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF5A4513)),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.local_fire_department_rounded, color: C.gold, size: 26),
+        const SizedBox(width: 8),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            days == 1 ? '1 día de racha' : '$days días seguidos',
+            style: sans(14, w: FontWeight.w700, color: C.gold),
+          ),
+          Text(badge.isEmpty ? sub : '$badge · $sub', style: sans(12, color: C.muted)),
+        ]),
+      ]),
+    );
+  }
+}

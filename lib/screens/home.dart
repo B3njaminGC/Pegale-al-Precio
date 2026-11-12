@@ -9,6 +9,7 @@ import '../net.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import '../update/update_dialog.dart';
+import 'duel.dart';
 import 'play.dart';
 import 'rank.dart';
 import 'rooms.dart';
@@ -254,6 +255,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ]),
                 ),
                 const SizedBox(height: 14),
+                if (env.streak >= 1) ...[
+                  StreakChip(days: env.streak, best: env.bestStreak, atRisk: !played),
+                  const SizedBox(height: 12),
+                ],
                 if (played) ...[
                   Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
                     Text('Hoy: ${num0(rec['score'] as num)} puntos', style: mono(13, w: FontWeight.w700, color: C.accent)),
@@ -320,9 +325,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ]),
             ),
+            const SizedBox(height: 12),
+            _Tile(
+              icon: Icons.swap_vert_rounded,
+              title: '¿Más caro o más barato?',
+              sub: 'Duelos rápidos entre dos productos. Seguí mientras no falles',
+              onTap: () => _go(MaterialPageRoute<void>(builder: (_) => const DuelScreen())),
+            ),
             const SizedBox(height: 22),
             const _How('01', 'Mirá el producto.', 'Foto y ficha técnica, sin el precio.'),
-            const _How('02', 'Fijá tu precio.', 'Cuanto más cerca, más puntos. Las rachas multiplican.'),
+            const _How('02', 'Fijá tu precio.', 'Cuanto más cerca, más puntos. Las rachas multiplican y podés pedir una pista a cambio de puntos.'),
             const _How('03', 'Compará.', 'Se revela el precio real y podés ir a la publicación.'),
             const SizedBox(height: 18),
             Panel(

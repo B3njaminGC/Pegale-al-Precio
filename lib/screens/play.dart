@@ -55,6 +55,7 @@ class _PlayScreenState extends State<PlayScreen> {
   LogEntry? entry;
   Product? shown;
   bool quitArmed = false;
+  int hintLevel = 0; // 0 = sin pista, 1 = rango amplio, 2 = rango ajustado
   Timer? _quitTimer;
 
   @override
@@ -103,7 +104,7 @@ class _PlayScreenState extends State<PlayScreen> {
     if (revealed || game.done) return;
     _focus.unfocus();
     final it = game.current;
-    final e = game.guess(price);
+    final e = game.guess(price, hint: hintLevel == 0 ? 0 : kHintCosts[hintLevel - 1]);
     if (e.base >= 700) {
       HapticFeedback.heavyImpact();
     } else {
@@ -136,6 +137,7 @@ class _PlayScreenState extends State<PlayScreen> {
         revealed = false;
         entry = null;
         shown = null;
+        hintLevel = 0;
       });
       _setPrice(kStart);
       _toTop();
@@ -340,9 +342,63 @@ class _PlayScreenState extends State<PlayScreen> {
         _nudge('+ 10%', 1.1),
         _nudge('× 2', 2),
       ]),
-      const SizedBox(height: 16),
+      const SizedBox(height: 14),
+      _hintArea(),
+      const SizedBox(height: 14),
       PrimaryButton('Fijar precio', onPressed: _lock),
     ]);
+  }
+
+  Widget _hintArea() {
+    final it = game.current;
+    final children = <Widget>[];
+    if (hintLevel > 0) {
+      final r = hintRange(it, hintLevel);
+      children.add(Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1B1708),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFF5A4513)),
+        ),
+        child: Row(children: [
+          const Icon(Icons.lightbulb_rounded, color: C.gold, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text.rich(TextSpan(children: [
+              TextSpan(text: 'El precio está entre ', style: sans(14, color: C.muted)),
+              TextSpan(text: '${money(r[0])} y ${money(r[1])}', style: sans(14, w: FontWeight.w700, color: C.gold)),
+              TextSpan(text: '  (−${kHintCosts[hintLevel - 1]} pts)', style: sans(12, color: C.faint)),
+            ])),
+          ),
+        ]),
+      ));
+    }
+    if (hintLevel < kHintCosts.length) {
+      final extra = kHintCosts[hintLevel] - (hintLevel == 0 ? 0 : kHintCosts[hintLevel - 1]);
+      children.add(Padding(
+        padding: EdgeInsets.only(top: hintLevel > 0 ? 8 : 0),
+        child: SizedBox(
+          width: double.infinity,
+          height: 44,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              _focus.unfocus();
+              setState(() => hintLevel++);
+            },
+            icon: const Icon(Icons.lightbulb_outline_rounded, size: 18),
+            label: Text(hintLevel == 0 ? 'Pedir una pista  ·  −$extra pts' : 'Pista más precisa  ·  −$extra pts más', style: sans(14)),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: C.muted,
+              side: const BorderSide(color: C.line2),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ),
+      ));
+    }
+    return Column(children: children);
   }
 
   Widget _nudge(String label, double f) => Expanded(
@@ -374,6 +430,7 @@ class _PlayScreenState extends State<PlayScreen> {
     final br = <String>['Base ${num0(e.base)}'];
     if (e.bonus > 0) br.add('Exacto +${e.bonus}');
     if (e.mult > 1) br.add('Racha ×${_mult(e.mult)}');
+    if (e.hint > 0) br.add('Pista −${e.hint}');
     final delta = e.err.abs() < 0.005 ? 'Clavaste el precio' : '${pct(e.err)} ${e.err > 0 ? 'más caro' : 'más barato'}';
     final hasLink = it.link != null;
     return TweenAnimationBuilder<double>(

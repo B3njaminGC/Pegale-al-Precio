@@ -85,6 +85,22 @@ class Env {
     }
   }
 
+  /* ----- rachas de días ----- */
+
+  bool dailyPlayed(String key) => getJson('pap.daily.$key') is Map;
+
+  /// Días seguidos jugando el desafío del día.
+  int get streak => dailyStreak(dailyPlayed, arDateKey());
+
+  int get bestStreak => prefs.getInt('pap.streak.best') ?? 0;
+
+  /// Guarda la mejor racha si la actual la supera. Devuelve la racha actual.
+  Future<int> noteStreak() async {
+    final s = streak;
+    if (s > bestStreak) await prefs.setInt('pap.streak.best', s);
+    return s;
+  }
+
   /* ----- productos que no se repiten ----- */
 
   Future<void> markSeen(Iterable<String> ids) async {
