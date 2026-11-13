@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
+import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
@@ -137,10 +138,10 @@ function startPoolMock() {
   const prods = q => {
     const out = [];
     for (let i = 0; i < 14; i++) {
-      const id = `MLA${q.replace(/\W/g, '').slice(0, 6)}${i}`;
+      const id = `MLA${createHash('md5').update(q).digest('hex').slice(0, 8)}${i}`;
       out.push({
         id, parent_id: `PAR${id}`, domain_id: 'MLA-THINGS', status: 'active',
-        name: i === 3 ? `Funda para ${q} ${i}` : `Acme ${q} modelo${i} ${i}`,
+        name: i === 3 ? `Funda para ${q} ${i}` : `Acme modelo${i} ${q}`,
         pictures: i === 5 ? [] : [{ url: `http://http2.mlstatic.com/${id}.jpg` }],
         attributes: [...brand, { id: 'POWER', name: 'Potencia', value_name: `${100 + i} W` }, { id: 'MATERIAL', name: 'Material', value_name: 'Acero' }, { id: 'CAPACITY', name: 'Capacidad', value_name: `${i + 1} L` }],
       });
@@ -181,7 +182,8 @@ test('corrida completa: suma productos nuevos, arma el plan, continúa donde que
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pool-'));
   const out = path.join(dir, 'products.json');
   const curated = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/products.json'), 'utf8'));
-  const base = { ...curated, items: curated.items.filter(i => i.src === 'ml') };
+  // Se parte de una muestra chica: el pool real puede estar cerca de su tope y la prueba no tiene que depender de eso.
+  const base = { ...curated, items: curated.items.filter(i => i.src === 'ml').slice(0, 40) };
   delete base.daily; delete base.pool;
   fs.writeFileSync(out, JSON.stringify(base));
   const env = { PRODUCTS_OUT: out, POOL_SKIP_FILE: path.join(dir, 'skip.json'), POOL_NEW_MAX: '60', POOL_PER_QUERY: '8' };

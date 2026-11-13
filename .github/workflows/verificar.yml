@@ -1,0 +1,44 @@
+name: Verificar
+
+# Corre en cada push y en cada pull request: revisa el código y corre todas las pruebas.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verificar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scripts:
+    name: Scripts de productos (Node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Revisar la sintaxis de los scripts
+        run: for f in scripts/*.mjs scripts/diagnostico/*.mjs tests/*.mjs; do node --check "$f"; done
+      - name: Correr las pruebas
+        run: node --test tests/*.test.mjs
+
+  app:
+    name: App (Flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Instalar dependencias
+        run: flutter pub get
+      - name: Analizar el código
+        # Los avisos informativos no frenan; los warnings y errores sí.
+        run: flutter analyze --no-fatal-infos
+      - name: Correr las pruebas
+        run: flutter test

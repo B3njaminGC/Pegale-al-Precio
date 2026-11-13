@@ -171,4 +171,72 @@ void main() {
     expect(streakBadge(3), 'Entrando en calor');
     expect(streakBadge(30), 'Leyenda');
   });
+
+  test('veredictos, rangos y cuadraditos de color', () {
+    expect(verdictOf(900, 200), 'Exacto');
+    expect(verdictOf(850, 0), 'Muy cerca');
+    expect(verdictOf(650, 0), 'Cerca');
+    expect(verdictOf(400, 0), 'Lejos');
+    expect(verdictOf(100, 0), 'Muy lejos');
+    expect(rankOf(900), 'Tasador experto');
+    expect(rankOf(720), 'Ojo clínico');
+    expect(rankOf(550), 'Buen ojo');
+    expect(rankOf(320), 'En formación');
+    expect(rankOf(10), 'A ciegas');
+    expect(tierOf(700), 'good');
+    expect(tierOf(699), 'mid');
+    expect(tierOf(349), 'bad');
+    LogEntry e(int base) => LogEntry(id: 'a', guess: 1, real: 1, pts: base, base: base, bonus: 0, mult: 1, err: 0);
+    expect(shareGrid([e(900), e(500), e(100)]), '🟩🟨🟥');
+  });
+
+  test('la racha de aciertos sube el multiplicador hasta un tope', () {
+    expect(multOf(0), 1.0);
+    expect(multOf(3), closeTo(1.3, 1e-12));
+    expect(multOf(5), closeTo(1.5, 1e-12));
+    expect(multOf(50), closeTo(1.5, 1e-12));
+  });
+
+  test('el desafío cambia cada día y no repite productos dentro del día', () {
+    final ps = List.generate(80, (i) => Product(id: 'p${i.toString().padLeft(2, '0')}', n: 'p$i', c: 'C', s: ['a'], p: 20000 + i));
+    final a = dailyItems(ps, '2026-11-12').map((p) => p.id).toList();
+    final b = dailyItems(ps, '2026-11-13').map((p) => p.id).toList();
+    expect(a.length, 5);
+    expect(a.toSet().length, 5);
+    expect(a, isNot(b));
+    // da lo mismo aunque la lista llegue en otro orden
+    expect(dailyItems(ps.reversed.toList(), '2026-11-12').map((p) => p.id).toList(), a);
+  });
+
+  test('parseProducts ignora lo que no sirve', () {
+    expect(parseProducts(null), isEmpty);
+    expect(parseProducts('hola'), isEmpty);
+    final out = parseProducts([
+      {'id': 'a', 'n': 'A', 's': ['x'], 'p': 50000},
+      {'id': 'b', 'n': 'B', 's': ['x'], 'p': 3},
+      'basura',
+      null,
+    ]);
+    expect(out.map((p) => p.id), ['a']);
+  });
+
+  test('códigos de sala y nombres', () {
+    final code = newRoomCode(mulberry32(1));
+    expect(code, matches(RegExp(r'^[A-Z0-9]{6}$')));
+    expect(code, isNot(contains('0')));
+    expect(code, isNot(contains('O')));
+    expect(normalizeCode('  abc '), 'ABC');
+    expect(normalizeCode('abcdefghij'), 'ABCDEF');
+    expect(sanitizeName('   '), '');
+  });
+
+  test('el precio se limita a lo que acepta el juego', () {
+    expect(clampPrice(1), kMin);
+    expect(clampPrice(999999999), kMax);
+    expect(clampPrice(123456), 123456);
+    expect(stepFor(20000), 500);
+    expect(stepFor(200000), 5000);
+    expect(stepFor(800000), 10000);
+    expect(stepFor(2000000), 50000);
+  });
 }
