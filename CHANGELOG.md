@@ -7,6 +7,7 @@ Todos los cambios importantes del proyecto se anotan acá. El formato sigue [Kee
 ### Añadido
 - Verificación automática en cada push (workflow `Verificar`): sintaxis de los scripts, pruebas de Node, `flutter analyze` y `flutter test`.
 - Pruebas nuevas de la lógica del juego y una prueba que revisa la forma de `data/products.json` y que el plan diario no repita productos.
+- Formularios de GitHub para reportar errores, sugerir mejoras y avisar de productos raros.
 - `LICENSE` (MIT), `CONTRIBUTING.md`, `docs/desarrollo.md` y este registro de cambios.
 
 ### Cambiado

@@ -1,0 +1,55 @@
+name: Reportar un error
+description: Algo no funciona o se rompió en la app
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por avisar! Cuanto más detalle, más fácil es arreglarlo.
+        **No pongas datos personales** (mail, teléfono, etc.) ni en el texto ni en las capturas.
+  - type: input
+    id: version
+    attributes:
+      label: Versión de la app
+      description: Se ve abajo de todo en la pantalla de inicio (por ejemplo v2.6.0).
+      placeholder: v2.6.0
+    validations:
+      required: true
+  - type: input
+    id: dispositivo
+    attributes:
+      label: Celular y versión de Android
+      placeholder: Samsung Galaxy A15, Android 14
+  - type: dropdown
+    id: donde
+    attributes:
+      label: ¿Dónde pasó?
+      options:
+        - Desafío del día
+        - Partida rápida
+        - ¿Más caro o más barato?
+        - Sala online
+        - Ranking
+        - Compartir resultado
+        - Instalar o actualizar la app
+        - Otro
+    validations:
+      required: true
+  - type: textarea
+    id: que-paso
+    attributes:
+      label: ¿Qué pasó y qué esperabas que pasara?
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para repetirlo
+      placeholder: |
+        1. Abrí la app
+        2. Toqué...
+  - type: textarea
+    id: capturas
+    attributes:
+      label: Capturas de pantalla
+      description: Podés arrastrar o pegar imágenes acá.

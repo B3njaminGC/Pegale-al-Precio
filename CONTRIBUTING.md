@@ -15,7 +15,7 @@
 
 ## Reportar un fallo común
 
-Abrí un [issue](https://github.com/B3njaminGC/Pegale-al-Precio/issues) con la versión de la app (se ve al pie del inicio), el modelo y la versión de Android, y qué pasó. Si es un producto con precio, foto o ficha rara, poné el nombre.
+Completá el [formulario de error](https://github.com/B3njaminGC/Pegale-al-Precio/issues/new?template=error.yml) (o el de [producto raro](https://github.com/B3njaminGC/Pegale-al-Precio/issues/new?template=producto.yml)) con la versión de la app (se ve al pie del inicio), el modelo y la versión de Android, y qué pasó. Si es un producto con precio, foto o ficha rara, poné el nombre.
 
 ## Reportar un fallo de seguridad
 

@@ -1,0 +1,28 @@
+name: Sugerir una mejora
+description: Una idea para sumar o cambiar en el juego
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Contanos la idea. No prometemos hacerla, pero todas se leen.
+  - type: textarea
+    id: idea
+    attributes:
+      label: ¿Qué te gustaría que hiciera el juego?
+    validations:
+      required: true
+  - type: textarea
+    id: por-que
+    attributes:
+      label: ¿Para qué te serviría o por qué mejoraría el juego?
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: ¿De qué se trata?
+      options:
+        - Un modo de juego nuevo
+        - Puntaje o reglas
+        - Ranking o salas
+        - Diseño o pantallas
+        - Productos o categorías
+        - Otra cosa

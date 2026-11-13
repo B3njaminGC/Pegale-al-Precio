@@ -42,6 +42,16 @@ Desde la versión 2.5.0 la app avisa en el inicio cuando hay una versión nueva,
 
 Los productos y los precios se actualizan solos, sin necesidad de reinstalar.
 
+## Errores y sugerencias
+
+¿Algo no anda o tenés una idea? Completá un formulario (hace falta una cuenta gratis de GitHub):
+
+- [Reportar un error](https://github.com/B3njaminGC/Pegale-al-Precio/issues/new?template=error.yml)
+- [Sugerir una mejora](https://github.com/B3njaminGC/Pegale-al-Precio/issues/new?template=sugerencia.yml)
+- [Avisar de un producto raro](https://github.com/B3njaminGC/Pegale-al-Precio/issues/new?template=producto.yml)
+
+Si encontraste un problema de seguridad, **no lo publiques**: usá el [aviso privado](https://github.com/B3njaminGC/Pegale-al-Precio/security/advisories/new).
+
 ## Privacidad
 
 El juego no pide mail, teléfono ni registro. Para el ranking y las salas inicia una sesión anónima (Firebase) y guarda en un servidor el **apodo que elegís, tu puntaje y el código de las salas en las que jugás**. Todo lo demás (récords, rachas, productos vistos, partidas en curso) queda solo en tu celular.
@@ -49,7 +59,7 @@ El juego no pide mail, teléfono ni registro. Para el ranking y las salas inicia
 ## Limitaciones conocidas
 
 - **Los precios son una referencia.** Se toma la mediana de ofertas nuevas en pesos al momento de actualizar (una vez por noche, y los productos más viejos se refrescan cada pocos días). El precio real en la publicación puede ser distinto, o la publicación puede haber cambiado o terminado.
-- **Los productos se eligen automáticamente.** Aunque se filtran accesorios, usados y repuestos, a veces aparece un producto raro, una ficha poco útil o una categoría mal asignada. Si ves alguno, avisá abriendo un [issue](https://github.com/B3njaminGC/Pegale-al-Precio/issues).
+- **Los productos se eligen automáticamente.** Aunque se filtran accesorios, usados y repuestos, a veces aparece un producto raro, una ficha poco útil o una categoría mal asignada. Si ves alguno, avisá con el [formulario de producto raro](https://github.com/B3njaminGC/Pegale-al-Precio/issues/new?template=producto.yml).
 - **El ranking confía en el celular.** Las reglas del servidor limitan el puntaje máximo, permiten una sola partida por día y que cada uno escriba solo lo suyo, pero alguien con conocimientos técnicos podría falsear su puntaje. No hay moderación de apodos más allá de un filtro básico de caracteres.
 - **Las salas no se borran solas.** Quedan en el servidor.
 - **Sin ranking para "¿Más caro o más barato?"** ni por categorías: el récord de ese modo es solo local.

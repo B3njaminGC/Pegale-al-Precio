@@ -1,0 +1,36 @@
+name: Producto raro (precio, foto, ficha o categoría)
+description: Un producto del juego que está mal
+labels: ["producto"]
+body:
+  - type: markdown
+    attributes:
+      value: Los productos se eligen de forma automática y a veces se cuela alguno raro. Ayudanos a sacarlo o corregirlo.
+  - type: input
+    id: nombre
+    attributes:
+      label: Nombre del producto (como sale en el juego)
+    validations:
+      required: true
+  - type: dropdown
+    id: problema
+    attributes:
+      label: ¿Qué está mal?
+      multiple: true
+      options:
+        - El precio real no parece correcto
+        - La foto no es del producto o no carga
+        - La ficha técnica no sirve o confunde
+        - Está en una categoría que no corresponde
+        - Es un accesorio, repuesto o usado
+        - Otro
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link a la publicación de Mercado Libre (si lo tenés)
+  - type: textarea
+    id: detalle
+    attributes:
+      label: Detalle
+      description: Podés pegar una captura.
