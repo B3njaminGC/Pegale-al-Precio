@@ -1,20 +1,51 @@
-node_modules/
+# --- Datos personales y secretos (nunca van al repositorio) ---
+.env
+.env.*
+*.pem
+*.jks
+*.p12
+*.keystore
+# Excepción: llave pública de depuración con la que se firma el APK (ver docs/desarrollo.md)
+!ci/debug.keystore
+key.properties
+google-services.json
+GoogleService-Info.plist
+*.local
+secrets*
+
+# --- Flutter / Dart ---
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
 .pub-cache/
 .pub/
+.metadata
+pubspec.lock
 build/
+coverage/
+
+# El proyecto de plataforma se genera en la compilación (flutter create) y no se guarda acá
 android/
 ios/
 web/
 linux/
 macos/
 windows/
-.metadata
-pubspec.lock
+local.properties
+
+# --- Node (scripts de productos) ---
+node_modules/
+npm-debug.log*
+
+# --- Registros y temporales ---
+ci.log
+*.log
+*.tmp
+
+# --- Editores y sistema operativo ---
 *.iml
 .idea/
-local.properties
-ci.log
+.vscode/
+.DS_Store
+Thumbs.db
