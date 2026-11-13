@@ -70,7 +70,7 @@ Future<File> renderShareCard({required String label, required Game g, int streak
   }
   y += sq + 70;
 
-  put(_text('${num0(g.total)}', 180, C.accent, family: 'monospace', w: FontWeight.w700), gap: 0);
+  put(_text(num0(g.total), 180, C.accent, family: 'monospace', w: FontWeight.w700), gap: 0);
   put(_text('puntos · ${rankOf(g.base / g.items.length)}', 44, C.muted, w: FontWeight.w500), gap: 50);
 
   if (streak >= 2) {

@@ -1,6 +1,11 @@
 // Prueba que Firebase esté bien configurado: sesión anónima, ranking del día, sala y reglas de seguridad.
-const KEY = 'AIzaSyB3ONfDb3MfTKBsV3IDkuWPBcb1vJr6lAM';
-const DB = 'https://pegale-al-precio-default-rtdb.firebaseio.com';
+// Ojo: escribe datos de prueba (fecha 2099-12-31 y una sala ZZZZ99) en la base real. Las reglas no permiten borrarlos desde acá (se pueden borrar a mano desde la consola de Firebase).
+// Toma la clave y la URL de lib/config.dart para no repetirlas acá.
+import fs from 'node:fs';
+const cfg = fs.readFileSync(new URL('../../lib/config.dart', import.meta.url), 'utf8');
+const KEY = /kFirebaseApiKey\s*=\s*'([^']+)'/.exec(cfg)?.[1];
+const DB = /kFirebaseDatabaseUrl\s*=\s*'([^']+)'/.exec(cfg)?.[1];
+if (!KEY || !DB) { console.error('Faltan kFirebaseApiKey / kFirebaseDatabaseUrl en lib/config.dart'); process.exit(1); }
 let fails = 0;
 const ok = (c, msg) => { console.log((c ? 'OK   ' : 'FALLA ') + msg); if (!c) fails++; };
 

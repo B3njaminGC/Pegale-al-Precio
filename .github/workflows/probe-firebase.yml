@@ -12,4 +12,4 @@ jobs:
         with:
           node-version: 22
       - name: Probar sesión, ranking, salas y reglas
-        run: node scripts/probe-firebase.mjs
+        run: node scripts/diagnostico/probe-firebase.mjs

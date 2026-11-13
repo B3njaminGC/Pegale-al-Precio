@@ -15,4 +15,4 @@ jobs:
         env:
           ML_CLIENT_ID: ${{ secrets.ML_CLIENT_ID }}
           ML_CLIENT_SECRET: ${{ secrets.ML_CLIENT_SECRET }}
-        run: node scripts/probe-ml.mjs
+        run: node scripts/diagnostico/probe-ml.mjs

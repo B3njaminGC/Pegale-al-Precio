@@ -50,7 +50,7 @@ class _EndScreenState extends State<EndScreen> {
     } else if (widget.practice) {
       note = 'Partida de práctica. En el ranking cuenta tu primera partida del día.';
     } else {
-      env.setJson('pap.daily.${_key}', {'score': g.total, 'base': g.base, 'grid': shareGrid(g.log)}).then((_) async {
+      env.setJson('pap.daily.$_key', {'score': g.total, 'base': g.base, 'grid': shareGrid(g.log)}).then((_) async {
         final s = await env.noteStreak();
         if (mounted) setState(() => _streak = s);
       });
@@ -65,7 +65,7 @@ class _EndScreenState extends State<EndScreen> {
   }
 
   Map<String, dynamic>? _rec() {
-    final r = env.getJson('pap.daily.${_key}');
+    final r = env.getJson('pap.daily.$_key');
     return r is Map ? Map<String, dynamic>.from(r) : null;
   }
 
