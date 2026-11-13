@@ -1,89 +1,75 @@
 # Pegale al Precio
 
-Juego para celular (Android) en el que adivinás el precio en pesos de productos reales que se venden en Mercado Libre Argentina. Ves la foto y la ficha, fijás tu precio y se revela el real, con el link a la publicación.
+[![Verificar](https://github.com/B3njaminGC/Pegale-al-Precio/actions/workflows/verificar.yml/badge.svg)](https://github.com/B3njaminGC/Pegale-al-Precio/actions/workflows/verificar.yml)
+[![Última versión](https://img.shields.io/github/v/release/B3njaminGC/Pegale-al-Precio?label=versi%C3%B3n)](https://github.com/B3njaminGC/Pegale-al-Precio/releases/latest)
+[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
 
-- **Desafío del día**: 5 productos iguales para todo el país. En el ranking cuenta la primera partida de cada día.
-- **Partida rápida**: 8 productos al azar.
-- **Salas online**: creás una sala, mandás el código y cada uno juega a su hora. La tabla se arma sola a medida que terminan.
-- **Ranking Argentina**: del día y de la semana.
+Juego para celular Android: ves la foto y la ficha de un producto real que se vende en Mercado Libre Argentina, fijás cuánto creés que cuesta (en pesos) y el juego te muestra el precio real y te da puntos según qué tan cerca estuviste.
 
-Juego independiente, sin relación con Mercado Libre. App hecha con Flutter, solo para celular.
+## Qué es y qué no es
 
-## Cómo está armado
+- **Es** un juego gratis, sin publicidad y sin cuentas. Los productos, fotos y precios salen del catálogo público de Mercado Libre Argentina.
+- **No es** una app de Mercado Libre ni tiene relación con la empresa. Tampoco es una tienda ni un comparador de precios: el precio que se muestra es una referencia (ver [limitaciones](#limitaciones-conocidas)).
+- **No es** para iPhone: solo Android.
 
-| Carpeta | Qué tiene |
-|---|---|
-| `lib/` | La app (Flutter): pantallas, puntaje, conexión online |
-| `test/` | Pruebas de la lógica (puntaje, desafío del día, fechas) |
-| `data/products.json` | Productos y precios del día. Va dentro de la app y además la app lo baja actualizado |
-| `scripts/` | `catalog.json` (qué productos se buscan) y `fetch-products.mjs` (trae precios y fotos de Mercado Libre) |
-| `database.rules.json` | Reglas de seguridad de Firebase |
-| `.github/workflows/` | `build-apk.yml` compila el APK; `update-products.yml` actualiza los precios cada día |
-| `ci/debug.keystore` | Firma con la que se compila el APK (la misma siempre, así se puede actualizar sin desinstalar) |
+## Qué se puede hacer
 
-## Bajar el APK
+- **Desafío del día:** 5 productos, los mismos para todo el país, una sola partida por día. Se renueva a las 00:00 (hora de Argentina). Si salís a la mitad, retomás donde quedaste.
+- **Partida rápida:** 8 productos al azar. Los productos ya vistos no se repiten hasta que viste casi todo el catálogo.
+- **¿Más caro o más barato?:** ves el precio de un producto y decidís si el siguiente cuesta más o menos. Seguís mientras no falles; se guarda tu récord en el celular.
+- **Salas online:** creás una sala, pasás el código y cada uno juega a su hora. La tabla se arma sola a medida que terminan.
+- **Ranking Argentina:** del día (hoy y ayer) y de la semana.
+- **Rachas de días:** cuántos días seguidos completaste el desafío, con insignias a los 3, 7, 14 y 30 días.
+- **Pistas:** podés pedir un rango de precio a cambio de puntos (100 la primera, 150 más la segunda).
+- **Compartir:** el resultado se comparte como imagen (por ejemplo por WhatsApp).
+- Cada producto tiene un botón para ver la publicación en Mercado Libre.
 
-1. En GitHub, pestaña **Actions**, **Compilar APK**, la última corrida verde: abajo, en **Artifacts**, está `pegale-al-precio-apk`.
-2. Para tenerlo siempre en **Releases**: creá un release nuevo con un tag que empiece con `v` (por ejemplo `v2.0.0`). El workflow compila y adjunta `pegale-al-precio.apk` solo.
-3. En el celu: abrí el APK y permití "instalar apps de esta fuente".
+### Cómo se puntúa
 
-Si ya tenías instalada la versión anterior (la de Capacitor), son apps distintas: podés desinstalarla.
+El puntaje de cada producto baja a medida que te alejás del precio real (la escala es proporcional, no en pesos: errar por el doble penaliza igual en un producto barato que en uno caro). Si te equivocás por 3 % o menos hay un bono de 200 puntos. Acertar varios seguidos (puntaje base de 700 o más) multiplica el puntaje, hasta ×1,5. El máximo por producto es 1.800.
 
-## Salas online y ranking (Firebase)
+## Instalación
 
-Hace falta un proyecto de Firebase gratis. Una sola vez:
+1. Entrá a [**Releases**](https://github.com/B3njaminGC/Pegale-al-Precio/releases/latest) y bajá `pegale-al-precio.apk` desde un celular Android.
+2. Abrilo. Android te va a pedir permiso para instalar apps de esta fuente y puede avisarte que no viene de Play Store: es normal, la app se distribuye solo por acá.
+3. Si ya tenías una versión instalada, el APK nuevo se instala encima y conserva tus datos.
 
-1. Entrá a [console.firebase.google.com](https://console.firebase.google.com) y creá un proyecto (sin Google Analytics).
-2. **Authentication**, **Sign-in method**, activá **Anónimo**.
-3. **Realtime Database**, **Crear base de datos** (elegí una región y modo bloqueado).
-4. En la pestaña **Reglas**, pegá todo el contenido de `database.rules.json` y publicá.
-5. **Configuración del proyecto** (la ruedita), **General**, **Tus apps**, agregá una app web (`</>`). Copiá `apiKey`. La `databaseURL` está en Realtime Database, arriba de los datos (algo como `https://tu-proyecto-default-rtdb.firebaseio.com`).
-6. Pegá esas dos cosas en `lib/config.dart` (`kFirebaseApiKey` y `kFirebaseDatabaseUrl`). Al guardar, GitHub compila un APK nuevo solo.
+Bajá el APK **siempre desde la página de Releases de este repositorio** y no de otro lado. El APK se firma con una llave que está en este mismo repo (ver [limitaciones](#limitaciones-conocidas)), así que no hay forma de verificar por la firma que un archivo que te pasó otra persona sea el original.
 
-Mientras esos datos estén vacíos, las salas y el ranking aparecen apagados y el resto del juego funciona igual.
+### Actualizar
 
-Límites a tener en cuenta: el ranking confía en lo que manda el celular (las reglas limitan el puntaje máximo, una sola partida por día y que cada uno escriba solo lo suyo, pero un jugador con conocimientos podría falsear su puntaje). Las salas no se borran solas.
+Desde la versión 2.5.0 la app avisa en el inicio cuando hay una versión nueva, y desde la 2.5.1 la descarga ella misma y abre el instalador de Android (la primera vez Android pide permiso para "instalar apps desconocidas"). Si tenés una versión anterior a la 2.5.1, bajá la nueva a mano desde Releases e instalala encima; de ahí en adelante se actualiza desde la app.
 
-## Precios y fotos reales de Mercado Libre
+Los productos y los precios se actualizan solos, sin necesidad de reinstalar.
 
-La búsqueda abierta de Mercado Libre (`/sites/MLA/search`) está cerrada a apps de terceros: da error 403 aunque uses credenciales. Lo que sí funciona con una app de desarrollador gratis es el **catálogo de productos** (`/products/search` y `/products/{id}/items`), que trae el nombre, la foto y las ofertas con precio en pesos. Es lo que usa el script.
+## Privacidad
 
-1. Entrá a [developers.mercadolibre.com.ar](https://developers.mercadolibre.com.ar), **Mis aplicaciones**, **Crear aplicación**.
-2. Copiá el **App ID** y la **Clave secreta**.
-3. En GitHub: **Settings**, **Secrets and variables**, **Actions**, **New repository secret**: `ML_CLIENT_ID` y `ML_CLIENT_SECRET`.
-4. En **Actions**, **Actualizar productos**, **Run workflow**. El resumen de la corrida muestra una tabla con el producto elegido de cada búsqueda y, abajo, por qué no se pudo actualizar cada uno de los que fallaron. Si alguno está mal, ajustá `scripts/catalog.json` (`q`, `must`, `not`, `lo`, `hi`).
+El juego no pide mail, teléfono ni registro. Para el ranking y las salas inicia una sesión anónima (Firebase) y guarda en un servidor el **apodo que elegís, tu puntaje y el código de las salas en las que jugás**. Todo lo demás (récords, rachas, productos vistos, partidas en curso) queda solo en tu celular.
 
-Corre todos los días a la madrugada y guarda `data/products.json`. Si un producto no se encuentra, queda con el último dato bueno (o con el precio estimado y sin foto). Si hay al menos 20 productos con datos reales, la app juega solo con esos.
+## Limitaciones conocidas
 
-## Miles de productos, sin repetir
-
-`scripts/build-pool.mjs` (corre cada noche en el mismo workflow, después de `fetch-products.mjs`) busca productos reales
-con las palabras de `scripts/pool-seeds.json` y suma los que tienen marca, foto y al menos 3 ofertas nuevas en pesos
-(se descartan accesorios, usados, repuestos y variantes del mismo modelo). Cada corrida suma hasta 500 productos nuevos,
-refresca los precios con más de 6 días y mantiene el pool en un máximo de 4.000. En `data/products.json` queda además
-el plan `daily` con los 5 productos de cada día de las próximas 2 semanas: son los mismos para todos y no se repite ninguno.
-
-En el celular, cada producto que jugaste queda marcado como visto y las partidas rápidas y las salas eligen siempre entre
-los que no viste (cuando ya viste casi todo, vuelve a empezar). Se puede correr a mano desde Actions con "Actualizar productos"
-para sumar más de una vez.
-
-## Colaborar
-
-El juego es gratis y sin publicidad. Si querés colaborar: alias de Mercado Pago **b3njamin.dev.mp**.
+- **Los precios son una referencia.** Se toma la mediana de ofertas nuevas en pesos al momento de actualizar (una vez por noche, y los productos más viejos se refrescan cada pocos días). El precio real en la publicación puede ser distinto, o la publicación puede haber cambiado o terminado.
+- **Los productos se eligen automáticamente.** Aunque se filtran accesorios, usados y repuestos, a veces aparece un producto raro, una ficha poco útil o una categoría mal asignada. Si ves alguno, avisá abriendo un [issue](https://github.com/B3njaminGC/Pegale-al-Precio/issues).
+- **El ranking confía en el celular.** Las reglas del servidor limitan el puntaje máximo, permiten una sola partida por día y que cada uno escriba solo lo suyo, pero alguien con conocimientos técnicos podría falsear su puntaje. No hay moderación de apodos más allá de un filtro básico de caracteres.
+- **Las salas no se borran solas.** Quedan en el servidor.
+- **Sin ranking para "¿Más caro o más barato?"** ni por categorías: el récord de ese modo es solo local.
+- **Firma del APK pública.** La llave con la que se firma el APK es una llave de depuración que está en el repositorio. Sirve para que las versiones se instalen una encima de otra, pero no protege contra un APK falso firmado con la misma llave.
+- **Poco probado en dispositivos.** Se probó en el celular del autor; no hay pruebas en una variedad de modelos ni versiones de Android.
+- Necesita internet para el ranking, las salas y para actualizar productos. El resto funciona sin conexión con los productos que ya bajó.
 
 ## Desarrollo
 
-Se necesita Flutter. El APK se puede compilar sin instalar nada, con GitHub Actions. Para probar en la compu:
+Este proyecto se hace **con ayuda de Claude** (el asistente de IA de Anthropic) como asistente de programación: buena parte del código, de las pruebas y de la documentación la escribe Claude a pedido del autor, y los commits conservan esa atribución. Cada cambio se verifica de dos formas:
 
-```bash
-flutter create --platforms=android --org com.pegalealprecio --project-name pegale_al_precio .
-flutter pub get
-flutter test
-flutter run
-```
+1. **Pruebas automáticas** que corren en cada push con GitHub Actions (lógica del juego, scripts de productos con un Mercado Libre simulado y forma de los datos), más el análisis del código.
+2. **Prueba manual** del autor en su celular. Lo que no está cubierto por pruebas (pantallas, ranking y salas contra el servidor real, instalación y actualización del APK, compartir imagen) depende de esa prueba manual.
 
-Los scripts de precios se prueban con `node --test tests/*.test.mjs` (usan un Mercado Libre simulado, no necesitan internet).
+Para colaborar, mirá [CONTRIBUTING.md](CONTRIBUTING.md). Para compilar, probar o sacar una versión, mirá [docs/desarrollo.md](docs/desarrollo.md). Los cambios de cada versión están en el [CHANGELOG](CHANGELOG.md).
 
-## Puntaje
+## Colaborar con el proyecto
 
-Base = `1000 · e^(−2,2 · |ln(tu precio / precio real)|)`. Si el error es de hasta 3% hay +200. Las rachas (puntaje base de 700 o más) multiplican hasta ×1,5. El máximo por producto es 1.800.
+El juego es gratis y sin publicidad. Si querés darme una mano, podés mandar una colaboración al alias de Mercado Pago **b3njamin.dev.mp**. Es opcional y no desbloquea nada en el juego.
+
+## Licencia
+
+[MIT](LICENSE). Mercado Libre y sus marcas pertenecen a sus dueños; las fotos y los nombres de los productos pertenecen a quienes los publican y se muestran con fines de juego, con link a la publicación original.
